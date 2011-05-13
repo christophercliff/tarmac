@@ -36,12 +36,13 @@
                     'javascripts/widgets/jquery.scrollbar.js',
                     'http://cdn.simplegeo.com/js/1.3/simplegeo.all.min.js',
                     'javascripts/app.js',
-                    'javascripts/controllers/location.js',
-                    'javascripts/controllers/map.js',
-                    'javascripts/models/location.js',
-                    'javascripts/collections/location.js',
-                    'javascripts/views/location-index.js',
-                    'javascripts/views/location-detail.js',
+                    'javascripts/controllers/feature.js',
+                    'javascripts/models/feature.js',
+                    'javascripts/collections/feature.js',
+                    'javascripts/views/database-index.js',
+                    'javascripts/views/collection-index.js',
+                    'javascripts/views/feature-index.js',
+                    'javascripts/views/feature-detail.js',
                     'javascripts/views/map-index.js'
                 ],
                 complete: function () {
@@ -69,8 +70,6 @@
                     
                     <div class="LocationIndex">
                         
-                        <div class="name">db_name</div>
-                        
                         <ul class="filter-set clearfix">
                             <li class="filter filter-all filter-selected">
                                 <a class="filter-a" href="#/locations" title="Locations">Locations</a>
@@ -86,9 +85,9 @@
                         <ol class="location-set">
                         
                         </ol>
-                    
+                        
                     </div><!-- /LocationIndex -->
-                
+                    
                     <script id="_LocationEdit" type="text/html">
                     
                         <ul class="field-set">
@@ -172,6 +171,34 @@
             </div>
             
         </div>
+        
+        <script id="DatabaseIndex" type="text/html">
+            
+            <div class="DatabaseIndex">
+                
+                <ol class="database-set">
+                    <li class="database">
+                        <a class="database-a" href="#" title=""></a>
+                    </li>
+                </ol>
+                
+            </div><!-- /DatabaseIndex -->
+            
+        </script>
+        
+        <script id="CollectionIndex" type="text/html">
+            
+            <div class="CollectionIndex">
+                
+                <ol class="collection-set">
+                    <li class="collection">
+                        <a class="collection-a" href="#" title=""></a>
+                    </li>
+                </ol>
+                
+            </div><!-- /DatabaseIndex -->
+            
+        </script>
         
     </body>
     

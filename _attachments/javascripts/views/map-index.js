@@ -171,7 +171,7 @@ tarmac.views.MapIndex = Backbone.View.extend({
         //console.log(test.coordinates);
         
         //return;
-        console.log(self.map.extent());
+        //console.log(self.map.extent());
         
         return;
     }

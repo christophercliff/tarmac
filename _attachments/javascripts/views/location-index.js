@@ -21,6 +21,13 @@ tarmac.views.LocationIndex = Backbone.View.extend({
         
         self.render();
         
+        $.ajax({
+            url: '/_all_dbs/',
+            success: function (response) {
+                console.log(response);
+            }
+        });
+        
         return self;
     },
     
@@ -33,10 +40,6 @@ tarmac.views.LocationIndex = Backbone.View.extend({
             ;
         
         self.locations.each(self.add);
-        
-        $('.__aux')
-            .scrollbar()
-            ;
         
         return;
     },
