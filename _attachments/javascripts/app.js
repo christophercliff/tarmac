@@ -5,7 +5,7 @@
     Backbone.couchConnector.viewName = 'byCollection';
     Backbone.couchConnector.enableChanges = false;
     
-    window.ski = {};
+    window.tarmac = {};
     tarmac.controllers = {};
     tarmac.models = {};
     tarmac.collections = {};
