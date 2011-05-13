@@ -1,0 +1,19 @@
+
+.__ {
+    width: 100%; height: 100%; overflow: hidden;
+    background-color: #000;
+}
+    .__tray {
+        position: absolute; left: 0; top: 0;
+        width: 450px; height: 100%; overflow: hidden;
+        color: #ebebeb;
+        background-color: hsla(0, 0%, 8%, 0.90);
+        -moz-box-shadow: 0 0 8px 4px hsla(0, 0%, 0%, 0.50);
+    }
+        .__tray-content {
+            position: absolute; left: 0; top: 0;
+            width: 465px; overflow-y: scroll;
+        }
+    .__main {
+        width: 100%; height: 100%;
+    }

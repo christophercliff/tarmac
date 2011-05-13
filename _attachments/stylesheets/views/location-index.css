@@ -1,0 +1,86 @@
+.LocationIndex {
+    padding-bottom: 20px;
+}
+    .LocationIndex .filter-set {
+        padding: 6px 20px;
+        background: -moz-linear-gradient(center top , #828282, #3e3e3e) repeat scroll 0 0 transparent;
+        border-top: solid 1px #7f7f84;
+        -moz-box-shadow: 0 -1px 0 #111111, -1px 1px 0 #000000, 0 0 5px #000000;
+        font-size: 12px; line-height: 12px;
+        text-shadow: -1px -1px 0 rgba(0, 0, 0, 1.00);
+    }
+        .LocationIndex .filter {
+            display: inline;
+        }
+            .LocationIndex .filter-a {
+                display: block; float: left;
+                padding: 9px 12px; margin-right: 6px;
+                color: #fff;
+            }
+            .LocationIndex .filter-selected .filter-a {
+                background: -moz-linear-gradient(center top , #686868, #2c2c2c) repeat scroll 0 0 transparent;
+                border-top: solid 1px #000;
+                border-bottom: solid 1px #7f7f84;
+                cursor: default;
+                -moz-border-radius: 4px;
+                -moz-box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.50);
+            }
+            .LocationIndex .filter-a:hover {
+                
+            }
+    .LocationIndex .location-set {
+        
+    }
+        .LocationIndex .location {
+            position: relative;
+            padding: 10px 20px;
+            border-bottom: solid 1px #000;
+        }
+        .LocationIndex .location:hover {
+            background-color: #000;
+            border-bottom: solid 1px #222;
+        }
+            .LocationIndex .location-name {
+                margin-bottom: 3px;
+                font-size: 18px; line-height: 18px;
+            }
+            .LocationIndex .location-property-set {
+                color: #e0e0e0;
+                font-size: 12px; line-height: 18px;
+            }
+                .LocationIndex .location-property {
+                    
+                }
+                    .LocationIndex .location-property-name {
+                        float: left;
+                        width: 50px;
+                        margin-right: 10px;
+                        font-weight: bold; text-transform: uppercase;
+                    }
+                    .LocationIndex .location-property-value {
+                        float: left;
+                    }
+            .LocationIndex .location-action-set {
+                padding: 10px 0;
+            }
+                .LocationIndex .location-action {
+                    display: inline;
+                }
+                    .LocationIndex .location-action-a {
+                        display: block; float: left;
+                        color: #888;
+                        margin-right: 10px;
+                    }
+                    .LocationIndex .location-action-a:hover {
+                        text-decoration: underline;
+                    }
+            .LocationIndex .remove-location {
+                position: absolute; right: 10px; top: 10px;
+                width: 10px; height: 0; overflow: hidden;
+                padding-top: 10px;
+                background-color: #555;
+                cursor: pointer;
+            }
+            .LocationIndex .remove-location:hover {
+                background-color: #e0e0e0;
+            }

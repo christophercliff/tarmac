@@ -1,0 +1,8 @@
+.MapIndex {
+    height: 100%;
+}
+    .MapIndex circle {
+        fill: #fff;
+        stroke: #000;
+        cursor: pointer;
+    }
