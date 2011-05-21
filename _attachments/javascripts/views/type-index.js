@@ -1,7 +1,7 @@
 
-tarmac.views.DatabaseIndex = Backbone.View.extend({
+tarmac.views.TypeIndex = Backbone.View.extend({
     
-    template: $('#DatabaseIndex'),
+    el: $('.TypeIndex'),
     
     events: {
         

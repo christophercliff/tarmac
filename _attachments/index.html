@@ -15,7 +15,9 @@
                 load: [
                     'stylesheets/lib/reset.css',
                     'stylesheets/lib/structure.css',
-                    'stylesheets/views/location-index.css',
+                    'stylesheets/views/type-index.css',
+                    'stylesheets/views/feature-index.css',
+                    'stylesheets/views/option-index.css',
                     'stylesheets/views/map-index.css'
                 ]
             });
@@ -36,11 +38,10 @@
                     'javascripts/widgets/jquery.scrollbar.js',
                     'http://cdn.simplegeo.com/js/1.3/simplegeo.all.min.js',
                     'javascripts/app.js',
-                    'javascripts/controllers/feature.js',
+                    'javascripts/controllers/map.js',
                     'javascripts/models/feature.js',
                     'javascripts/collections/feature.js',
-                    'javascripts/views/database-index.js',
-                    'javascripts/views/collection-index.js',
+                    'javascripts/views/type-index.js',
                     'javascripts/views/feature-index.js',
                     'javascripts/views/feature-detail.js',
                     'javascripts/views/map-index.js'
@@ -68,94 +69,42 @@
                 
                 <div class="__tray-content">
                     
-                    <div class="LocationIndex">
+                    <div class="TypeIndex">
                         
-                        <ul class="filter-set clearfix">
-                            <li class="filter filter-all filter-selected">
-                                <a class="filter-a" href="#/locations" title="Locations">Locations</a>
+                        <ul class="type-set clearfix">
+                            <li class="type type-locations type-selected">
+                                <a class="type-a" href="#/locations" title="Locations">Locations</a>
                             </li>
-                            <li class="filter filter-all">
-                                <a class="filter-a" href="#/people" title="People">People</a>
+                            <li class="type type-people type-selected">
+                                <a class="type-a" href="#/people" title="People">People</a>
                             </li>
-                            <li class="filter filter-all">
-                                <a class="filter-a" href="#/images" title="Images">Images</a>
+                            <li class="type type-images type-selected">
+                                <a class="type-a" href="#/images" title="Images">Images</a>
                             </li>
                         </ul>
-                    
-                        <ol class="location-set">
                         
+                    </div><!-- /CollectionIndex -->
+                    
+                    <div class="FeatureIndex">
+                        
+                        <ol class="feature-set">
+                            
                         </ol>
                         
-                    </div><!-- /LocationIndex -->
+                    </div><!-- /FeatureIndex -->
                     
-                    <script id="_LocationEdit" type="text/html">
-                    
-                        <ul class="field-set">
-                            <li class="field">
-                                <label></label>
-                                <input type="text" value="" />
-                            </li>
-                            <li class="field">
-                                <label></label>
-                                <input type="text" value="" />
-                            </li>
-                            <li class="street">
-                                <label></label>
-                                <input type="text" value="" />
-                            </li>
-                        <ul>
-                    
-                    </script>
-                
-                    <script id="_LocationDetail" type="text/html">
-                    
-                        <li class="location clearfix">
-                            <div class="location-name"><%= id %></div>
-                            <ul class="location-property-set">
-                                <li class="property clearfix">
-                                    <div class="location-property-name">Lat:</div>
-                                    <div class="location-property-value"><%= geometry.coordinates[1] %></div>
-                                </li>
-                                <li class="location-property clearfix">
-                                    <div class="location-property-name">Lon:</div>
-                                    <div class="location-property-value"><%= geometry.coordinates[0] %></div>
-                                </li>
-                            </ul>
-                            <ul class="location-action-set clearfix">
-                                <li class="location-action location-action-context">
-                                    <a class="location-action-a" href="#" title="Get Context">Get Context</a>
-                                </li>
-                                <li class="location-action location-action-places">
-                                    <a class="location-action-a" href="#" title="Get Places">Get Places</a>
-                                </li>
-                            </ul>
-                            <div class="location-modifier"></div>
-                            <div class="remove-location">Remove</div>
-                        </li><!-- /_LocationDetail -->
-                    
-                    </script>
-                
-                    <script id="_PlaceIndex" type="text/html">
-                    
-                        <ul class="place-set">
+                    <div class="OptionIndex">
                         
-                        </ul>
-                    
-                    </script>
+                        
+                        
+                    </div><!-- /OptionIndex -->
                 
-                    <script id="_PlaceDetail" type="text/html">
-                    
-                        <li class="place">
-                            <ul class="place-property-set">
-                                <li class="place-property">
-                                    <div class="place-property-name"><%= name %></div>
-                                    <div class="place-property-value"><%= value %></div>
-                                </li>
-                            <ul>
-                        </li>
-                    
-                    </script>
+                </div>
                 
+                <div class="__tray-border">
+                    
+                    
+                    
                 </div>
                 
             </div>
@@ -172,32 +121,90 @@
             
         </div>
         
-        <script id="DatabaseIndex" type="text/html">
-            
-            <div class="DatabaseIndex">
-                
-                <ol class="database-set">
-                    <li class="database">
-                        <a class="database-a" href="#" title=""></a>
-                    </li>
-                </ol>
-                
-            </div><!-- /DatabaseIndex -->
-            
+        <script id="_FeatureEdit" type="text/html">
+        
+            <ul class="field-set">
+                <li class="field">
+                    <label></label>
+                    <input type="text" value="" />
+                </li>
+                <li class="field">
+                    <label></label>
+                    <input type="text" value="" />
+                </li>
+                <li class="street">
+                    <label></label>
+                    <input type="text" value="" />
+                </li>
+            <ul>
+        
         </script>
         
-        <script id="CollectionIndex" type="text/html">
-            
-            <div class="CollectionIndex">
-                
-                <ol class="collection-set">
-                    <li class="collection">
-                        <a class="collection-a" href="#" title=""></a>
+        <script id="_FeatureDetail" type="text/html">
+        
+            <li class="feature clearfix" data-id="<%= id %>">
+                <div class="feature-name"><%= id %></div>
+                <ul class="feature-group-set">
+                    <li class="feature-group">
+                        <div class="feature-group-name">Geometry</div>
+                        <ul class="feature-property-set">
+                            <li class="property clearfix">
+                                <div class="feature-property-name">Lat:</div>
+                                <div class="feature-property-value"><%= geometry.coordinates[1] %></div>
+                            </li>
+                            <li class="feature-property clearfix">
+                                <div class="feature-property-name">Lon:</div>
+                                <div class="feature-property-value"><%= geometry.coordinates[0] %></div>
+                            </li>
+                        </ul>
                     </li>
-                </ol>
-                
-            </div><!-- /DatabaseIndex -->
+                    <% if (properties) { %>
+                        <li class="feature-group">
+                            <div class="feature-group-name">Properties</div>
+                            <ul class="feature-property-set">
+                                <% _.each(properties, function(val, key){ %>
+                                    <li class="property clearfix">
+                                        <div class="feature-property-name"><%= key %>:</div>
+                                        <div class="feature-property-value"><%= val %></div>
+                                    </li>
+                                <% }); %>
+                            </ul>
+                        </li>
+                    <% } %>
+                </ul>
+                <ul class="feature-action-set clearfix">
+                    <li class="feature-action feature-action-context">
+                        <a class="feature-action-a" href="#" title="Get Context">Get Context</a>
+                    </li>
+                    <li class="feature-action feature-action-places">
+                        <a class="feature-action-a" href="#" title="Get Places">Get Places</a>
+                    </li>
+                </ul>
+                <div class="feature-modifier"></div>
+                <div class="remove-feature">Remove</div>
+            </li><!-- /_FeatureDetail -->
+        
+        </script>
+    
+        <script id="_PlaceIndex" type="text/html">
+        
+            <ul class="place-set">
             
+            </ul>
+        
+        </script>
+    
+        <script id="_PlaceDetail" type="text/html">
+        
+            <li class="place">
+                <ul class="place-property-set">
+                    <li class="place-property">
+                        <div class="place-property-name"><%= name %></div>
+                        <div class="place-property-value"><%= value %></div>
+                    </li>
+                <ul>
+            </li>
+        
         </script>
         
     </body>

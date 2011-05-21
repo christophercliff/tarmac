@@ -1,12 +1,12 @@
 
-tarmac.views.LocationDetail = Backbone.View.extend({
+tarmac.views.FeatureDetail = Backbone.View.extend({
     
-    template: _.template($('#_LocationDetail').html()),
+    template: _.template($('#_FeatureDetail').html()),
     
     events: {
-        'click .location-action-places': 'places',
-        'click .location-action-context': 'context',
-        'click .remove-location': 'remove'
+        'click .feature-action-places': 'places',
+        'click .feature-action-context': 'context',
+        'click .remove-feature': 'remove'
     },
     
     initialize: function () {
@@ -23,9 +23,26 @@ tarmac.views.LocationDetail = Backbone.View.extend({
     render: function () {
         
         var self = this,
-            json = self.model.toJSON();
+            json = self.model.toJSON(),
+            id = self.model.get('id');
+            
+        self.el = $(self.template(json));
         
-        $(self.el).html(self.template(self.model.toJSON()));
+        self.el
+            .hover(function(){
+                
+                $('*')
+                    .trigger('hover.on.feature.' + id)
+                    ;
+                
+            },function(){
+                
+                $('*')
+                    .trigger('hover.off.feature.' + id)
+                    ;
+                
+            })
+            ;
         
         return;
     },
@@ -58,7 +75,7 @@ tarmac.views.LocationDetail = Backbone.View.extend({
         }
         
         coords = self.model.get('coords');
-        $m = self.$('.location-modifier');
+        $m = self.$('.feature-modifier');
         
         tarmac.simpleGeo.places.search(coords.lat, coords.lon, {}, function(err, data){
             
@@ -82,7 +99,7 @@ tarmac.views.LocationDetail = Backbone.View.extend({
         }
         
         coords = self.model.get('coords');
-        $m = self.$('.location-modifier');
+        $m = self.$('.feature-modifier');
         
         tarmac.simpleGeo.context.getContext(coords.lat, coords.lon, function(err, data){
             

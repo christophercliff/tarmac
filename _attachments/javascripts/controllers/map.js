@@ -8,16 +8,20 @@ tarmac.controllers.Map = Backbone.Controller.extend({
     index: function () {
         
         var self = this,
-            locations = new tarmac.collections.Location();
+            features = new tarmac.collections.Feature();
         
-        locations.fetch();
+        features.fetch();
         
         new tarmac.views.MapIndex({
-            locations: locations
+            features: features
         });
         
-        new tarmac.views.LocationIndex({
-            locations: locations
+        new tarmac.views.TypeIndex({
+            features: features
+        });
+        
+        new tarmac.views.FeatureIndex({
+            features: features
         });
         
         return;

@@ -1,5 +1,5 @@
 
-tarmac.models.Location = Backbone.Model.extend({
+tarmac.models.Feature = Backbone.Model.extend({
     
     initialize: function () {
         

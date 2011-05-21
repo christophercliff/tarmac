@@ -12,13 +12,13 @@ tarmac.views.MapIndex = Backbone.View.extend({
         
         var self = this;
         
-        self.locations = self.options.locations;
+        self.features = self.options.features;
         
         _.bindAll(self, 'refresh', 'renderMarker');
         
-        self.locations.bind('refresh', self.refresh);
-        self.locations.bind('add', self.refresh);
-        self.locations.bind('remove', self.refresh);
+        self.features.bind('refresh', self.refresh);
+        self.features.bind('add', self.refresh);
+        self.features.bind('remove', self.refresh);
         
         self.render();
         
@@ -48,10 +48,10 @@ tarmac.views.MapIndex = Backbone.View.extend({
             //url = po.url('http://mt0.google.com/vt/lyrs=m@152000000&hl=en&x={X}&y={Y}&z={Z}&s=G').hosts(['a.', 'b.', 'c.', '']);
         
         self.map = po.map();
-        self.locationsLayer = po.geoJson();
+        self.featuresLayer = po.geoJson();
         self.imagesLayer = po.geoJson();
         
-        self.locationsLayer
+        self.featuresLayer
             .on('load', self.renderMarker)
             ;
         
@@ -68,7 +68,7 @@ tarmac.views.MapIndex = Backbone.View.extend({
             .add(po.interact())
             .add(po.image().url(url))
             .add(po.compass().pan('none'))
-            .add(self.locationsLayer)
+            .add(self.featuresLayer)
             .add(self.imagesLayer)
             ;
         
@@ -83,13 +83,15 @@ tarmac.views.MapIndex = Backbone.View.extend({
             p = self.map.mouse(e),
             coords = self.map.pointLocation(p);
         
-        self.locations.create({
+        self.features.create({
             type: 'Feature',
             geometry: {
                 coordinates: [coords.lon, coords.lat],
                 type: 'Point'
             },
-            properties: {}
+            properties: {
+                type: 'Location'
+            }
         });
         
         return;
@@ -97,9 +99,45 @@ tarmac.views.MapIndex = Backbone.View.extend({
     
     renderMarker: function (e) {
         
-        var self = this;
+        var self = this,
+            f;
         
-        
+        _.each(e.features, function(f){
+            
+            var $el = $(f.element),
+                id = f.data.id;
+            
+            $el
+                .bind('hover.on.feature.' + id, function(){
+                    console.log(1);
+                    f.element
+                        .setAttribute('r', 6.5)
+                        ;
+                    
+                })
+                .bind('hover.off.feature.' + id, function(){
+                    
+                    f.element
+                        .setAttribute('r', 4.5)
+                        ;
+                    
+                })
+                .hover(function(){
+                    
+                    f.element
+                        .setAttribute('r', 6.5)
+                        ;
+                    
+                },function(){
+                    
+                    f.element
+                        .setAttribute('r', 4.5)
+                        ;
+                    
+                })
+                ;
+            
+        });
         
         return;
     },
@@ -126,21 +164,21 @@ tarmac.views.MapIndex = Backbone.View.extend({
     refresh: function () {
         
         var self = this,
-            features = self.locations.toJSON();
+            features = self.features.toJSON();
         
-        if (!self.locationsLayer)
+        if (!self.featuresLayer)
         {
             return;
         }
         
-        self.locationsLayer.features(features);
+        self.featuresLayer.features(features);
         self.fit();
         
         return;
     },
     
     fit: function () {
-        
+        return;
         var self = this,
             features,
             lon_max,
@@ -150,12 +188,12 @@ tarmac.views.MapIndex = Backbone.View.extend({
             lat_min,
             lat_mid;
         
-        if (!self.locations)
+        if (!self.features)
         {
             return;
         }
         
-        features = self.locations.toJSON();
+        features = self.features.toJSON();
         
         //// HACK: shitty algorithm, gonna bottleneck at some point
         

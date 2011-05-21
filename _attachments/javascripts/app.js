@@ -1,6 +1,6 @@
 (function(){
     
-    Backbone.couchConnector.databaseName = 'tarmac_dev';
+    Backbone.couchConnector.databaseName = 'tarmac';
     Backbone.couchConnector.ddocName = 'tarmac';
     Backbone.couchConnector.viewName = 'byCollection';
     Backbone.couchConnector.enableChanges = false;
@@ -20,7 +20,6 @@
         tarmac.simpleGeo.places = new simplegeo.PlacesClient(tarmac.simpleGeo.token);
         tarmac.simpleGeo.context = new simplegeo.ContextClient(tarmac.simpleGeo.token);;
         
-        //new tarmac.controllers.Location();
         new tarmac.controllers.Map();
         
         Backbone.history.start();

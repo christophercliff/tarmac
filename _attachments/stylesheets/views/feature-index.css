@@ -1,0 +1,59 @@
+.FeatureIndex {
+    padding-bottom: 20px;
+}
+    .FeatureIndex .feature-set {
+        
+    }
+        .FeatureIndex .feature {
+            position: relative;
+            padding: 10px 20px;
+            border-bottom: solid 1px #000;
+        }
+        .FeatureIndex .feature:hover {
+            background-color: #000;
+            border-bottom: solid 1px #222;
+        }
+            .FeatureIndex .feature-name {
+                margin-bottom: 3px;
+                font-size: 18px; line-height: 18px;
+            }
+            .FeatureIndex .feature-property-set {
+                color: #e0e0e0;
+                font-size: 12px; line-height: 18px;
+            }
+                .FeatureIndex .feature-property {
+                    
+                }
+                    .FeatureIndex .feature-property-name {
+                        float: left;
+                        width: 50px;
+                        margin-right: 10px;
+                        font-weight: bold; text-transform: uppercase;
+                    }
+                    .FeatureIndex .feature-property-value {
+                        float: left;
+                    }
+            .FeatureIndex .feature-action-set {
+                padding: 10px 0;
+            }
+                .FeatureIndex .feature-action {
+                    display: inline;
+                }
+                    .FeatureIndex .feature-action-a {
+                        display: block; float: left;
+                        color: #888;
+                        margin-right: 10px;
+                    }
+                    .FeatureIndex .feature-action-a:hover {
+                        text-decoration: underline;
+                    }
+            .FeatureIndex .remove-feature {
+                position: absolute; right: 10px; top: 10px;
+                width: 10px; height: 0; overflow: hidden;
+                padding-top: 10px;
+                background-color: #555;
+                cursor: pointer;
+            }
+            .FeatureIndex .remove-feature:hover {
+                background-color: #e0e0e0;
+            }

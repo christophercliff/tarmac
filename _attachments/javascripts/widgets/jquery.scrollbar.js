@@ -37,5 +37,3 @@
     });
     
 })(jQuery);
-
-console.log(1, $.scrollbar);
