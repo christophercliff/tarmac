@@ -3,6 +3,8 @@ Work in progress...
 
 ## Quick start
 
+View example app at http://christophercliff.iriscouch.com/tarmac/_design/tarmac/index.html.
+
 ### Pull a local instance from a remote server
 
 First create a local target:
@@ -25,4 +27,4 @@ Then push your database to the remote server:
 
     curl -v -H "Content-Type: application/json" -X POST http://127.0.0.1:5984/_replicate -d '{"source":"tarmac","target":"http://{YOUR_USERNAME}.iriscouch.com/tarmac"}'
     
-View the app at http://{YOUR_USERNAME}.iriscouch.com/tarmac/_design/tarmac/index.html.
+View the app at [http://{YOUR_USERNAME}.iriscouch.com/tarmac/_design/tarmac/index.html](http://{YOUR_USERNAME}.iriscouch.com/tarmac/_design/tarmac/index.html).
