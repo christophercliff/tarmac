@@ -1,4 +1,6 @@
 
+Tarmac is a CouchApp for managing, visualizing and distributing geospatial data. It is currently in super alpha.
+
 ## Immediate goals
 
 - Automatically fit map bounds to current dataset
@@ -10,11 +12,12 @@
 ## Long term goals
 
 - Support complex geometry (e.g. lines and polygons)
+- Optional permissions
 - Integration with third party APIs for data cleanup (e.g. SimpleGeo places)
 - Performance optimizations
 - Build optimizations
 - Support some mobile browsers
-- Improved UI design and identity
+- Refined UI design and identity
 - Project homepage with documentation and examples
 
 ## Example application
@@ -49,4 +52,23 @@ View the app at [http://{YOUR_USERNAME}.iriscouch.com/tarmac/_design/tarmac/inde
 
 ## Quick start for developers
 
-### Install couchapp
+### Fork Tarmac
+
+...
+
+### Install Couchbase Server or sign up for free hosting at Iris Couch
+
+...
+
+### Install `couchapp`
+
+...
+
+### Install the CouchApp bundle for TextMate
+
+...
+
+### Get your own API token from SimpleGeo and CloudMade
+
+...
+
