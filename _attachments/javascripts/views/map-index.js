@@ -44,8 +44,8 @@ tarmac.views.MapIndex = Backbone.View.extend({
             $el = self.el,
             po = org.polymaps,
             container = $el.get(0).appendChild(po.svg('svg')),
-            //url = po.url('http://{S}tile.cloudmade.com' + '/854bf27409ba4b129dd49f137020299b' + '/32111/256/{Z}/{X}/{Y}.png').hosts(['a.', 'b.', 'c.', '']);
-            url = po.url('http://mt0.google.com/vt/lyrs=m@152000000&hl=en&x={X}&y={Y}&z={Z}&s=G').hosts(['a.', 'b.', 'c.', '']);
+            url = po.url('http://{S}tile.cloudmade.com' + '/854bf27409ba4b129dd49f137020299b' + '/32111/256/{Z}/{X}/{Y}.png').hosts(['a.', 'b.', 'c.', '']);
+            //url = po.url('http://mt0.google.com/vt/lyrs=m@152000000&hl=en&x={X}&y={Y}&z={Z}&s=G').hosts(['a.', 'b.', 'c.', '']);
         
         self.map = po.map();
         self.featuresLayer = po.geoJson();
@@ -109,7 +109,7 @@ tarmac.views.MapIndex = Backbone.View.extend({
             
             $el
                 .bind('hover.on.feature.' + id, function(){
-                    console.log(1);
+                    
                     f.element
                         .setAttribute('r', 6.5)
                         ;
@@ -124,11 +124,19 @@ tarmac.views.MapIndex = Backbone.View.extend({
                 })
                 .hover(function(){
                     
+                    $('*')
+                        .trigger('hover.on.feature.' + id)
+                        ;
+                    
                     f.element
                         .setAttribute('r', 6.5)
                         ;
                     
                 },function(){
+                    
+                    $('*')
+                        .trigger('hover.off.feature.' + id)
+                        ;
                     
                     f.element
                         .setAttribute('r', 4.5)

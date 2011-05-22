@@ -9,7 +9,7 @@
             padding: 10px 20px;
             border-bottom: solid 1px #000;
         }
-        .FeatureIndex .feature:hover {
+        .FeatureIndex .feature-hover {
             background-color: #000;
             border-bottom: solid 1px #222;
         }

@@ -1,5 +1,5 @@
-
-function(doc){
+function(doc)
+{
     if (doc.type === 'Feature')
     {
         if (doc.properties && doc.properties.type)

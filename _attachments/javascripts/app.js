@@ -2,7 +2,7 @@
     
     Backbone.couchConnector.databaseName = 'tarmac';
     Backbone.couchConnector.ddocName = 'tarmac';
-    Backbone.couchConnector.viewName = 'byCollection';
+    Backbone.couchConnector.viewName = 'features';
     Backbone.couchConnector.enableChanges = false;
     
     window.tarmac = {};

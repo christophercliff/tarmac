@@ -38,7 +38,7 @@ tarmac.views.TypeIndex = Backbone.View.extend({
         var self = this;
         
         self.$('.type-set')
-            .append('<li class="type"><a class="type-a" href="#' + encodeURIComponent(model.get('name')) + '" title="' + model.get('name') + '">' + model.get('name') + '</a></li>')
+            .append('<li class="type type-selected"><a class="type-a" href="#' + encodeURIComponent(model.get('name')) + '" title="' + model.get('name') + '">' + model.get('name') + '</a></li>')
             ;
         
         return;

@@ -24,11 +24,26 @@ tarmac.views.FeatureDetail = Backbone.View.extend({
         
         var self = this,
             json = self.model.toJSON(),
-            id = self.model.get('id');
+            id = self.model.get('id'),
+            C_HOVER = 'feature-hover';
             
         self.el = $(self.template(json));
         
         self.el
+            .bind('hover.on.feature.' + id, function(){
+                
+                self.el
+                    .addClass(C_HOVER)
+                    ;
+                
+            })
+            .bind('hover.off.feature.' + id, function(){
+                
+                self.el
+                    .removeClass(C_HOVER)
+                    ;
+                
+            })
             .hover(function(){
                 
                 $('*')
