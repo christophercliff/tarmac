@@ -1,8 +1,8 @@
 .FeatureIndex {
-    padding-bottom: 20px;
+    overflow-y: scroll;
 }
     .FeatureIndex .feature-set {
-        
+        padding: 20px 0;
     }
         .FeatureIndex .feature {
             position: relative;

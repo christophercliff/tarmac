@@ -13,13 +13,14 @@ tarmac.views.FeatureIndex = Backbone.View.extend({
         
         self.features = self.options.features;
         
-        _.bindAll(self, 'render', 'add');
+        _.bindAll(self, 'render', 'add', 'updateHeight');
         
         self.features.bind('add', self.add);
         self.features.bind('remove', self.render);
         self.features.bind('refresh', self.render);
         
         self.render();
+        self.events();
         
         return self;
     },
@@ -27,6 +28,8 @@ tarmac.views.FeatureIndex = Backbone.View.extend({
     render: function () {
         
         var self = this;
+        
+        self.updateHeight();
         
         self.$('.feature-set')
             .empty()
@@ -45,6 +48,33 @@ tarmac.views.FeatureIndex = Backbone.View.extend({
             .append(new tarmac.views.FeatureDetail({
                 model: model
             }).el)
+            ;
+        
+        return;
+    },
+    
+    events: function () {
+        
+        var self = this,
+            throttled = _.throttle(self.updateHeight, 100);
+        
+        $(window)
+            .resize(throttled)
+            ;
+        
+        return;
+    },
+    
+    updateHeight: function () {
+        
+        var self = this,
+            h_win = $(window).height(),
+            h_types = $('.TypeIndex').outerHeight();
+        
+        self.el
+            .css({
+                height: h_win - h_types + 'px'
+            })
             ;
         
         return;
