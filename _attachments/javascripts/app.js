@@ -20,7 +20,7 @@
         tarmac.simpleGeo.places = new simplegeo.PlacesClient(tarmac.simpleGeo.token);
         tarmac.simpleGeo.context = new simplegeo.ContextClient(tarmac.simpleGeo.token);;
         
-        new tarmac.controllers.Map();
+        new tarmac.controllers.Feature();
         
         Backbone.history.start();
         

@@ -37,13 +37,13 @@ tarmac.views.FeatureIndex = Backbone.View.extend({
         return;
     },
     
-    add: function (l) {
+    add: function (model) {
         
         var self = this;
         
         self.$('.feature-set')
             .append(new tarmac.views.FeatureDetail({
-                model: l
+                model: model
             }).el)
             ;
         

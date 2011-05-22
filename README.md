@@ -19,6 +19,7 @@ Tarmac is a CouchApp for managing, visualizing and distributing geospatial data.
 - Support some mobile browsers
 - Refined UI design and identity
 - Project homepage with documentation and examples
+- Dedicated tile server
 
 ## Example application
 
