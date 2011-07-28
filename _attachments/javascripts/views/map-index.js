@@ -12,14 +12,6 @@ tarmac.views.MapIndex = Backbone.View.extend({
         
         var self = this;
         
-        self.features = self.options.features;
-        
-        _.bindAll(self, 'refresh', 'renderMarker');
-        
-        self.features.bind('refresh', self.refresh);
-        self.features.bind('add', self.refresh);
-        self.features.bind('remove', self.refresh);
-        
         self.render();
         
         return self;
@@ -29,16 +21,12 @@ tarmac.views.MapIndex = Backbone.View.extend({
         
         var self = this;
         
-        navigator.geolocation.getCurrentPosition(function(p){
-            
-            self.renderMap(p);
-            
-        });
+        self.renderMap();
         
         return;
     },
     
-    renderMap: function (p) {
+    renderMap: function () {
         
         var self = this,
             $el = self.el,
@@ -51,28 +39,28 @@ tarmac.views.MapIndex = Backbone.View.extend({
         self.featuresLayer = po.geoJson();
         self.imagesLayer = po.geoJson();
         
-        self.featuresLayer
+        /*self.featuresLayer
             .on('load', self.renderMarker)
             ;
         
         self.imagesLayer
             .on('load', self.renderImage)
-            ;
+            ;*/
         
         self.map
             .center({
-                lat: p.coords.latitude,
-                lon: p.coords.longitude
+                lat: 39.9522783,
+                lon: -75.1636505
             })
             .container(container)
             .add(po.interact())
             .add(po.image().url(url))
-            .add(po.compass().pan('none'))
+            //.add(po.compass().pan('none'))
             .add(self.featuresLayer)
             .add(self.imagesLayer)
             ;
         
-        self.refresh();
+        //self.refresh();
         
         return;
     },

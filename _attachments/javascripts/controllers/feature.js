@@ -11,7 +11,7 @@ tarmac.controllers.Feature = Backbone.Controller.extend({
             features = new tarmac.collections.Feature(),
             types = new tarmac.collections.Type();
         
-        features.fetch();
+        /*features.fetch();
         
         $.ajax({
             url: '/tarmac/_design/tarmac/_view/types',
@@ -31,16 +31,11 @@ tarmac.controllers.Feature = Backbone.Controller.extend({
                 new tarmac.views.TypeIndex({
                     types: types
                 });
-            },
-        });
+            }
+        });*/
         
-        new tarmac.views.FeatureIndex({
-            features: features
-        });
-        
-        new tarmac.views.MapIndex({
-            features: features
-        });
+        new tarmac.views.DbIndex();
+        new tarmac.views.MapIndex();
         
         return;
     }

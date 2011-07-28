@@ -1,0 +1,14 @@
+body:after {
+    clear: both;
+}
+.Tray {
+    float: right;
+    width: 50%; min-height: 100%;
+}
+.Map {
+    float: right;
+    width: 50%; min-height: 100%;
+}
+.Map .map {
+    height: 1000px;
+}

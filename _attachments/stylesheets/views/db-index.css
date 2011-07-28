@@ -1,0 +1,31 @@
+
+.DbIndex {
+    
+}
+    .DbIndex .db-set {
+        
+    }
+        .DbIndex .db {
+            position: relative;
+            padding: 10px 20px;
+            border-bottom: solid 1px #192024;
+        }
+            .DbIndex .db-name {
+                font-size: 16px; line-height: 16px;
+            }
+            .DbIndex .db-button-set {
+                position: absolute; right: 10px; top: 10px;
+            }
+                .DbIndex .db-button {
+                    display: inline;
+                }
+                    .DbIndex .db-button-a {
+                        display: block; float: left;
+                        padding: 5px;
+                        color: #fff;
+                        background-color: #333;
+                        font-size: 11px; line-height: 11px;
+                    }
+                    .DbIndex .db-button-a:hover {
+                        background-color: #666;
+                    }
