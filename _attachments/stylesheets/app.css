@@ -9,6 +9,6 @@ body:after {
     float: right;
     width: 50%; min-height: 100%;
 }
-.Map .map {
+.Map .Map-map {
     height: 1000px;
 }

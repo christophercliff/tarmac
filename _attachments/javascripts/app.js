@@ -137,9 +137,16 @@
         
         className: 'Feature',
         
+        events: {
+            'click.Feature .Feature-id': 'show',
+            'hover.Feature .Feature-id': 'hover'
+        },
+        
         initialize: function () {
             
             var self = this;
+            
+            _.bindAll(self, 'hover', 'show');
             
             self.template = _.template($('#' + self.className).html());
             
@@ -153,6 +160,24 @@
             $(self.el).html(self.template(self.model.toJSON()));
             
             return self;
+        },
+        
+        hover: function () {
+            
+            var self = this;
+            
+            
+            
+            return;
+        },
+        
+        show: function () {
+            
+            var self = this;
+            
+            
+            
+            return;
         }
         
     });
@@ -167,7 +192,7 @@
             
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
-            self.map = org.polymaps.map();
+            self.map = null;
             
             return;
         },
@@ -176,6 +201,8 @@
             
             var self = this,
                 $groups;
+            
+            self.renderMap();
             
             $(self.el).html(self.template({}));
             
@@ -193,7 +220,7 @@
             return self;
         },
         
-        renderMap: function () {
+        renderMapPolymaps: function () {
             
             var self = this,
                 po = org.polymaps,
@@ -210,11 +237,26 @@
                 ;
             
             return;
+        },
+        
+        renderMap: function () {
+            
+            var self = this,
+                layer = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'} );
+            
+            self.map = new OpenLayers.Map(self.$('.' + self.className + '-map').get(0), {
+                controls: []
+            });
+            console.log(self.map);
+            self.map.addLayer(layer);
+            self.map.setCenter(new OpenLayers.LonLat(-71.05315709590911, 42.35779636641356), 12);
+            
+            return;
         }
         
     });
     
-    window.GroupView = Backbone.View.extend({
+    window.GroupViewPolymaps = Backbone.View.extend({
         
         className: 'Group',
         
@@ -228,7 +270,7 @@
             self.template = _.template($('#' + self.className).html());
             self.features = self.model.features;
             self.map = self.options.map;
-            self.layer = po.geoJson()
+            self.layer = po.geoJson();
             
             self.features.bind('reset', self.render);
             
@@ -243,15 +285,7 @@
             $(self.el).html(self.template(self.model.toJSON()));
             
             $markers = self.$('.Marker-collection');
-            /*
-            self.features.each(function(model){
-                $markers
-                    .append(new FeatureView({
-                        model: model
-                    }).render().el)
-                    ;
-            });
-            */
+            
             if (!self.map.container())
             {
                 return self;
@@ -261,7 +295,73 @@
                 .add(self.layer)
                 ;
             
-            self.layer.features(self.features.toJSON());
+            self.layer
+                .features(self.features.toJSON())
+                ;
+            
+            return self;
+        }
+        
+    });
+    
+    window.GroupView = Backbone.View.extend({
+        
+        className: 'Group',
+        
+        initialize: function () {
+            
+            var self = this;
+            
+            _.bindAll(self, 'render');
+            
+            self.template = _.template($('#' + self.className).html());
+            self.features = self.model.features;
+            self.map = self.options.map;
+            self.layer = new OpenLayers.Layer.Vector();
+            
+            self.map
+                .addLayer(self.layer)
+                ;
+            
+            self.features.bind('reset', self.render);
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this,
+                $markers;
+            
+            $(self.el).html(self.template(self.model.toJSON()));
+            
+            $markers = self.$('.Marker-collection');
+            
+            
+            
+            return self;
+        }
+        
+    });
+    
+    window.MarkerView = Backbone.View.extend({
+        
+        className: 'Marker',
+        
+        initialize: function () {
+            
+            var self = this;
+            
+            self.template = _.template($('#' + self.className).html());
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this;
+            
+            $(self.el).html(self.template());
             
             return self;
         }
@@ -297,7 +397,7 @@
             document.body.appendChild(self.mapView.render().el);
             document.body.appendChild(self.trayView.render().el);
             
-            self.mapView.renderMap();
+            //self.mapView.renderMap();
             
             return;
         }
