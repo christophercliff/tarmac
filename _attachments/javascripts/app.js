@@ -138,17 +138,22 @@
         className: 'Feature',
         
         events: {
-            'click.Feature .Feature-id': 'show',
-            'hover.Feature .Feature-id': 'hover'
+            'click.Feature .Feature-id': 'toggle'
         },
         
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'hover', 'show');
+            _.bindAll(self, 'toggle', 'select', 'deselect');
             
             self.template = _.template($('#' + self.className).html());
+            self.isSelected = false;
+            
+            self.model
+                .bind('select', self.select)
+                .bind('deselect', self.deselect)
+                ;
             
             return;
         },
@@ -162,20 +167,62 @@
             return self;
         },
         
-        hover: function () {
+        toggle: function () {
             
             var self = this;
             
+            if (self.isSelected)
+            {
+                self.deselect();
+                
+                return;
+            }
             
+            self.select();
             
             return;
         },
         
-        show: function () {
+        select: function () {
             
             var self = this;
             
+            if (self.isSelected)
+            {
+                return
+            }
             
+            self.isSelected = true;
+            
+            self.$('.' + self.className + '-id')
+                .css({
+                    fontWeight: 'bold'
+                })
+                ;
+            
+            self.model.trigger('select');
+            
+            return;
+        },
+        
+        deselect: function () {
+            
+            var self = this;
+            
+            if (!self.isSelected)
+            {
+                return;
+            }
+            
+            self.isSelected = false;
+            
+            self.$('.' + self.className + '-id')
+                .css({
+                    fontWeight: 'normal'
+                })
+                ;
+            
+            self.model.trigger('deselect');
             
             return;
         }
@@ -202,8 +249,6 @@
             var self = this,
                 $groups;
             
-            self.renderMap();
-            
             $(self.el).html(self.template({}));
             
             $groups = self.$('.Group-collection');
@@ -211,8 +256,7 @@
             self.databases.each(function(model){
                 $groups
                     .append(new GroupView({
-                        model: model,
-                        map: self.map
+                        model: model
                     }).render().el)
                     ;
             });
@@ -240,7 +284,7 @@
         },
         
         renderMap: function () {
-            
+            return;
             var self = this,
                 layer = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'} );
             
@@ -316,12 +360,6 @@
             
             self.template = _.template($('#' + self.className).html());
             self.features = self.model.features;
-            self.map = self.options.map;
-            self.layer = new OpenLayers.Layer.Vector();
-            
-            self.map
-                .addLayer(self.layer)
-                ;
             
             self.features.bind('reset', self.render);
             
@@ -337,7 +375,13 @@
             
             $markers = self.$('.Marker-collection');
             
-            
+            self.features.each(function(model){
+                $markers
+                    .append(new MarkerView({
+                        model: model
+                    }).render().el)
+                    ;
+            });
             
             return self;
         }
@@ -352,6 +396,78 @@
             
             var self = this;
             
+            _.bindAll(self, 'select', 'deselect');
+            
+            self.template = _.template($('#' + self.className).html());
+            self.editor = new EditorView({
+                model: self.model
+            });
+            
+            self.model.bind('select', self.select);
+            self.model.bind('deselect', self.deselect);
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this;
+            
+            $(self.el).html(self.template(self.model.toJSON()));
+            
+            return self;
+        },
+        
+        select: function (e) {
+            
+            var self = this;
+            
+            self.$('.' + self.className + '-id')
+                .css({
+                    fontWeight: 'bold'
+                })
+                ;
+            
+            $(self.el)
+                .append(self.editor.render().el)
+                ;
+            
+            return;
+        },
+        
+        deselect: function () {
+            
+            var self = this;
+            
+            self.$('.' + self.className + '-id')
+                .css({
+                    fontWeight: 'normal'
+                })
+                ;
+            
+            self.$('.Editor')
+                .remove()
+                ;
+            
+            return;
+        }
+        
+    });
+    
+    window.EditorView = Backbone.View.extend({
+        
+        className: 'Editor',
+        
+        events: {
+            'click .Editor-cancel': 'cancel'
+        },
+        
+        initialize: function () {
+            
+            var self = this;
+            
+            _.bindAll(self, 'cancel');
+            
             self.template = _.template($('#' + self.className).html());
             
             return;
@@ -361,9 +477,19 @@
             
             var self = this;
             
-            $(self.el).html(self.template());
+            $(self.el).html(self.template(self.model.toJSON()));
             
             return self;
+        },
+        
+        cancel: function (e) {
+            e.preventDefault();
+            
+            var self = this;
+            
+            self.model.trigger('deselect');
+            
+            return;
         }
         
     });

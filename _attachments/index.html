@@ -29,7 +29,21 @@
             
         </script>
         
-        <script type="text/template" id="Tray">
+        <script id="Manager" type="text/template">
+            
+            <a class="Manager-close" href="#">Cancel</a>
+            
+            <ol class="Server-collection"></ol>
+            
+        </script>
+        
+        <script id="Server" type="text/template">
+            
+            <div class="Server-name"><%= name %></div>
+            
+        </script>
+        
+        <script id="Tray" type="text/template">
             
             <div class="Tray-name">Databases</div>
             
@@ -46,7 +60,7 @@
             
         </script>
         
-        <script type="text/template" id="Database">
+        <script id="Database" type="text/template">
             
             <div class="Database-name">Database: <%= name %></div>
             
@@ -63,13 +77,13 @@
             
         </script>
         
-        <script type="text/template" id="Feature">
+        <script id="Feature" type="text/template">
             
             <div class="Feature-id">Feature: <%= properties._id %></div>
             
         </script>
         
-        <script type="text/template" id="Map">
+        <script id="Map" type="text/template">
             
             <div class="Map-name">Map</div>
             
@@ -79,7 +93,7 @@
             
         </script>
         
-        <script type="text/template" id="Group">
+        <script id="Group" type="text/template">
             
             <div class="Group-name">Group: <%= name %></div>
             
@@ -87,15 +101,27 @@
             
         </script>
         
-        <script type="text/template" id="Marker">
+        <script id="Marker" type="text/template">
             
-            <div class="Marker-id">Marker: asdf</div>
+            <div class="Marker-id">Marker: <%= properties._id %></div>
             
         </script>
         
-        <script type="text/template" id="Editor">
+        <script id="Editor" type="text/template">
             
-            Editor
+            <div class="">Editor: <%= properties._id %></div>
+            
+            <form class="Editor-form" action="">
+                
+                <input value="<%= geometry.coordinates[0] %>" />
+                
+                <input value="<%= geometry.coordinates[1] %>" />
+                
+                <input type="submit" value="Update" />
+                
+                <a class="Editor-cancel" href="#">Cancel</a>
+                
+            </form>
             
         </script>
         
