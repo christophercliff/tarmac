@@ -17,6 +17,7 @@
             yepnope({
                 load: [
                     'javascripts/lib/jquery-1.6.0.js',
+                    'javascripts/lib/jquery.request.js',
                     'javascripts/lib/jquery-ui-1.8.10.js',
                     'javascripts/lib/underscore.js',
                     'javascripts/lib/backbone.js',
@@ -71,6 +72,9 @@
                 <li class="">
                     <a class="clear-features" href="#">Hide</a>
                 </li>
+                <li class="">
+                    <a class="add-feature" href="#">Add</a>
+                </li>
             </ul>
             
             <ol class="Feature-collection"></ol>
@@ -95,7 +99,7 @@
         
         <script id="Group" type="text/template">
             
-            <div class="Group-name">Group: <%= name %></div>
+            <div class="Group-name">Group: <%= slug %></div>
             
             <ol class="Marker-collection"></ol>
             
@@ -111,11 +115,13 @@
             
             <div class="">Editor: <%= properties._id %></div>
             
-            <form class="Editor-form" action="">
+            <form class="Editor-form" action="#">
                 
-                <input value="<%= geometry.coordinates[0] %>" />
+                <input name="type" value="<%= geometry.type %>" />
                 
-                <input value="<%= geometry.coordinates[1] %>" />
+                <input name="coordinates" value="<%= geometry.coordinates[0] %>" />
+                
+                <input name="coordinates" value="<%= geometry.coordinates[1] %>" />
                 
                 <input type="submit" value="Update" />
                 

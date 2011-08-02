@@ -1,13 +1,35 @@
 (function(window, undefined){
     
+    window.Server = Backbone.Model.extend({
+        
+    });
+    
+    window.Servers = Backbone.Collection.extend({
+        
+        model: Server,
+        
+        url: '/tarmac/_design/tarmac/_view/by_type?key="server"'
+        
+    });
+    
+    window.Detectable = Backbone.Model.extend({
+        
+    });
+    
+    window.Detectables = Backbone.Collection.extend({
+        
+        model: Detectable,
+        
+    });
+    
     window.Database = Backbone.Model.extend({
         
         initialize: function () {
             
             var self = this;
-            
+            console.log(self);
             self.features = new Features();
-            self.features.url = '/' + self.get('name') + '/_design/geo/_spatiallist/geojson/pointsFull?bbox=-180%2C-90%2C180%2C90';
+            self.features.url = '/' + self.get('slug') + '/_design/geo/_spatiallist/geojson/pointsFull?bbox=-180%2C-90%2C180%2C90';
             
             return;
         }
@@ -16,11 +38,19 @@
     
     window.Databases = Backbone.Collection.extend({
         
-        model: Database
+        model: Database,
+        
+        url: '/tarmac/_design/tarmac/_view/by_type?key="database"',
+        
+        parse: function (response) {
+            return _.pluck(response.rows, 'value');
+        }
         
     });
     
     window.Feature = Backbone.Model.extend({
+        
+        
         
     });
     
@@ -42,8 +72,12 @@
             
             var self = this;
             
+            _.bindAll(self, 'render');
+            
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
+            
+            self.databases.bind('reset', self.render)
             
             return;
         },
@@ -113,7 +147,8 @@
             return self;
         },
         
-        fetchFeatures: function () {
+        fetchFeatures: function (e) {
+            e.preventDefault();
             
             var self = this;
             
@@ -122,7 +157,8 @@
             return;
         },
         
-        clearFeatures: function () {
+        clearFeatures: function (e) {
+            e.preventDefault();
             
             var self = this;
             
@@ -237,9 +273,13 @@
             
             var self = this;
             
+            _.bindAll(self, 'render');
+            
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
-            self.map = null;
+            self.map = org.polymaps.map();;
+            
+            self.databases.bind('reset', self.render);
             
             return;
         },
@@ -256,7 +296,8 @@
             self.databases.each(function(model){
                 $groups
                     .append(new GroupView({
-                        model: model
+                        model: model,
+                        map: self.map
                     }).render().el)
                     ;
             });
@@ -264,7 +305,7 @@
             return self;
         },
         
-        renderMapPolymaps: function () {
+        renderMap: function () {
             
             var self = this,
                 po = org.polymaps,
@@ -283,7 +324,7 @@
             return;
         },
         
-        renderMap: function () {
+        renderMap2: function () {
             return;
             var self = this,
                 layer = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'} );
@@ -300,7 +341,7 @@
         
     });
     
-    window.GroupViewPolymaps = Backbone.View.extend({
+    window.GroupView = Backbone.View.extend({
         
         className: 'Group',
         
@@ -330,6 +371,14 @@
             
             $markers = self.$('.Marker-collection');
             
+            self.features.each(function(model){
+                $markers
+                    .append(new MarkerView({
+                        model: model
+                    }).render().el)
+                    ;
+            });
+            
             if (!self.map.container())
             {
                 return self;
@@ -348,7 +397,7 @@
         
     });
     
-    window.GroupView = Backbone.View.extend({
+    window.GroupView2 = Backbone.View.extend({
         
         className: 'Group',
         
@@ -392,16 +441,22 @@
         
         className: 'Marker',
         
+        events: {
+            'click .Marker-id': 'toggle',
+            'submit form': 'submit'
+        },
+        
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'select', 'deselect');
+            _.bindAll(self, 'select', 'deselect', 'submit');
             
             self.template = _.template($('#' + self.className).html());
             self.editor = new EditorView({
                 model: self.model
             });
+            self.isSelected = false;
             
             self.model.bind('select', self.select);
             self.model.bind('deselect', self.deselect);
@@ -418,9 +473,32 @@
             return self;
         },
         
+        toggle: function () {
+            
+            var self = this;
+            
+            if (self.isSelected)
+            {
+                self.model.trigger('deselect');
+                
+                return;
+            }
+            
+            self.model.trigger('select');
+            
+            return;
+        },
+        
         select: function (e) {
             
             var self = this;
+            
+            if (self.isSelected)
+            {
+                return;
+            }
+            
+            self.isSelected = true;
             
             self.$('.' + self.className + '-id')
                 .css({
@@ -439,6 +517,13 @@
             
             var self = this;
             
+            if (!self.isSelected)
+            {
+                return;
+            }
+            
+            self.isSelected = false;
+            
             self.$('.' + self.className + '-id')
                 .css({
                     fontWeight: 'normal'
@@ -448,6 +533,20 @@
             self.$('.Editor')
                 .remove()
                 ;
+            
+            return;
+        },
+        
+        submit: function (e) {
+            e.preventDefault();
+            
+            var self = this;
+            
+            self.model.set({
+                geometry: self.$('form').serializeObject()
+            });
+            
+            self.model.trigger('deselect');
             
             return;
         }
@@ -520,10 +619,12 @@
             
             var self = this;
             
+            window.databases.fetch();
+            
             document.body.appendChild(self.mapView.render().el);
             document.body.appendChild(self.trayView.render().el);
             
-            //self.mapView.renderMap();
+            self.mapView.renderMap();
             
             return;
         }
@@ -531,10 +632,53 @@
     });
     
     window.databases = new Databases();
-    window.databases.reset([{name:'bicycle_parking'},{name:'bus_stops'}]);
+    //window.databases.reset([{name:'bicycle_parking'},{name:'bus_stops'}]);
     
     $(function(){
         new Tarmac();
     });
+    
+    /*Backbone.sync = function (method, model, options) {
+        
+        if (method === 'create' || method === 'update')
+        {
+            console.log(1);
+            //Backbone.couchConnector.create(model, options.success, options.error);
+        }
+        else if (method === 'read')
+        {
+            // Decide whether to read a whole collection or just one specific model
+            if (model.collection)
+            {
+                
+            } else {
+                
+            }
+                Backbone.couchConnector.readModel(model, options.success, options.error);
+            else
+                Backbone.couchConnector.readCollection(model, options.success, options.error);
+        }
+        else if (method === 'delete')
+        {
+            Backbone.couchConnector.del(model, options.success, options.error);
+        }  
+    }*/
+    
+    $.fn.serializeObject = function()
+    {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
     
 })(window);
