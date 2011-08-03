@@ -6,9 +6,18 @@ body:after {
     width: 50%; min-height: 100%;
 }
 .Map {
+    position: relative;
     float: right;
     width: 50%; min-height: 100%;
 }
 .Map .map {
-    height: 1000px;
+    height: 500px;
+}
+    .Map circle {
+        fill: #fff;
+        stroke: #000;
+        cursor: pointer;
+    }
+.Group-collection {
+    position: absolute; right: 100%;
 }

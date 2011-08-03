@@ -27,7 +27,7 @@
         initialize: function () {
             
             var self = this;
-            console.log(self);
+            
             self.features = new Features();
             self.features.url = '/' + self.get('slug') + '/_design/geo/_spatiallist/geojson/pointsFull?bbox=-180%2C-90%2C180%2C90';
             
@@ -50,7 +50,14 @@
     
     window.Feature = Backbone.Model.extend({
         
-        
+        initialize: function () {
+            
+            var self = this;
+            
+            self.id = self.get('properties')._id;
+            
+            return;
+        }
         
     });
     
@@ -209,12 +216,12 @@
             
             if (self.isSelected)
             {
-                self.deselect();
+                self.model.trigger('deselect');
                 
                 return;
             }
             
-            self.select();
+            self.model.trigger('select');
             
             return;
         },
@@ -236,8 +243,6 @@
                 })
                 ;
             
-            self.model.trigger('select');
-            
             return;
         },
         
@@ -258,8 +263,6 @@
                 })
                 ;
             
-            self.model.trigger('deselect');
-            
             return;
         }
         
@@ -273,23 +276,44 @@
             
             var self = this;
             
-            _.bindAll(self, 'render');
+            _.bindAll(self, 'render', 'renderCollection');
             
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
-            self.map = org.polymaps.map();;
+            self.map = org.polymaps.map();
             
-            self.databases.bind('reset', self.render);
+            self.databases.bind('reset', self.renderCollection);
             
             return;
         },
         
         render: function () {
             
-            var self = this,
-                $groups;
+            var self = this;
             
             $(self.el).html(self.template({}));
+            
+            return self;
+        },
+        
+        renderCollection: function () {
+            
+            var self = this,
+                $groups = self.$('.Group-collection');
+                po = org.polymaps,
+                container = self.el.appendChild(po.svg('svg')),
+                url = po.url('http://mt0.googleapis.com/vt?lyrs=t@127,r@158&src=apiv3&hl=en-US&x={X}&y={Y}&z={Z}&s=Gali');
+                //url = po.url('http://{S}tile.cloudmade.com' + '/854bf27409ba4b129dd49f137020299b' + '/32111/256/{Z}/{X}/{Y}.png').hosts(['a.', 'b.', 'c.', '']);
+            
+            self.map
+                .center({
+                    lat: 42.35779636641356,
+                    lon: -71.05315709590911
+                })
+                .zoom(13)
+                .container(container)
+                .add(po.image().url(url))
+                ;
             
             $groups = self.$('.Group-collection');
             
@@ -301,40 +325,6 @@
                     }).render().el)
                     ;
             });
-            
-            return self;
-        },
-        
-        renderMap: function () {
-            
-            var self = this,
-                po = org.polymaps,
-                container = self.el.appendChild(po.svg('svg')),
-                url = po.url('http://{S}tile.cloudmade.com' + '/854bf27409ba4b129dd49f137020299b' + '/32111/256/{Z}/{X}/{Y}.png').hosts(['a.', 'b.', 'c.', '']);
-            
-            self.map
-                .center({
-                    lat: 42.35779636641356,
-                    lon: -71.05315709590911
-                })
-                .container(container)
-                .add(po.image().url(url))
-                ;
-            
-            return;
-        },
-        
-        renderMap2: function () {
-            return;
-            var self = this,
-                layer = new OpenLayers.Layer.WMS('OpenLayers WMS', 'http://vmap0.tiles.osgeo.org/wms/vmap0', {layers: 'basic'} );
-            
-            self.map = new OpenLayers.Map(self.$('.' + self.className + '-map').get(0), {
-                controls: []
-            });
-            console.log(self.map);
-            self.map.addLayer(layer);
-            self.map.setCenter(new OpenLayers.LonLat(-71.05315709590911, 42.35779636641356), 12);
             
             return;
         }
@@ -350,7 +340,7 @@
             var self = this,
                 po = org.polymaps;
             
-            _.bindAll(self, 'render');
+            _.bindAll(self, 'render', 'load');
             
             self.template = _.template($('#' + self.className).html());
             self.features = self.model.features;
@@ -390,49 +380,118 @@
             
             self.layer
                 .features(self.features.toJSON())
+                .on('load', self.load)
                 ;
             
             return self;
+        },
+        
+        load: function (e) {
+            
+            var self = this;
+            
+            _.each(e.features, function(f,i){
+                
+                new SvgFeatureView({
+                    el: f.element,
+                    model: self.features.get(f.data.properties._id)
+                });
+                
+            });
+            
+            return;
         }
         
     });
     
-    window.GroupView2 = Backbone.View.extend({
+    window.SvgFeatureView = Backbone.View.extend({
         
-        className: 'Group',
+        events: {
+            'click': 'toggle',
+            'mouseenter': 'mouseenter',
+            'mouseleave': 'mouseleave'
+        },
         
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'render');
+            _.bindAll(self, 'toggle', 'mouseenter', 'mouseleave', 'select', 'deselect');
             
-            self.template = _.template($('#' + self.className).html());
-            self.features = self.model.features;
+            self.isSelected = false;
             
-            self.features.bind('reset', self.render);
+            self.model
+                .bind('select', self.select)
+                .bind('deselect', self.deselect)
+                ;
             
             return;
         },
         
-        render: function () {
+        toggle: function () {
             
-            var self = this,
-                $markers;
+            var self = this;
             
-            $(self.el).html(self.template(self.model.toJSON()));
+            if (self.isSelected)
+            {
+                self.model.trigger('deselect');
+                
+                return;
+            }
             
-            $markers = self.$('.Marker-collection');
+            self.model.trigger('select');
             
-            self.features.each(function(model){
-                $markers
-                    .append(new MarkerView({
-                        model: model
-                    }).render().el)
-                    ;
-            });
+            return;
+        },
+        
+        mouseenter: function () {
             
-            return self;
+            var self = this;
+            
+            self.el
+                .setAttribute('r', 6.5)
+                ;
+            
+            return;
+        },
+        
+        mouseleave: function () {
+            
+            var self = this;
+            
+            self.el
+                .setAttribute('r', 4.5)
+                ;
+            
+            return;
+        },
+        
+        select: function () {
+            
+            var self = this;
+            
+            if (self.isSelected)
+            {
+                return;
+            }
+            
+            self.isSelected = true;
+            
+            return;
+        },
+        
+        deselect: function () {
+            
+            var self = this;
+            
+            if (!self.isSelected)
+            {
+                return;
+            }
+            
+            self.isSelected = false;
+            
+            return;
         }
         
     });
@@ -458,8 +517,10 @@
             });
             self.isSelected = false;
             
-            self.model.bind('select', self.select);
-            self.model.bind('deselect', self.deselect);
+            self.model
+                .bind('select', self.select)
+                .bind('deselect', self.deselect)
+                ;
             
             return;
         },
@@ -619,12 +680,10 @@
             
             var self = this;
             
-            window.databases.fetch();
-            
             document.body.appendChild(self.mapView.render().el);
             document.body.appendChild(self.trayView.render().el);
             
-            self.mapView.renderMap();
+            window.databases.fetch();
             
             return;
         }
