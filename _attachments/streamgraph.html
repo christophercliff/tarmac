@@ -1,0 +1,212 @@
+
+<!DOCTYPE html> 
+<html> 
+  <head> 
+    <meta http-equiv="content-type" content="text/html;charset=utf-8"> 
+    <title>d3.js ~ Streamgraph</title> 
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js?1.29.1"></script> 
+    <style type="text/css"> 
+ 
+@import url("http://mbostock.github.com/d3/style.css?1.10.0");
+@import url("http://mbostock.github.com/d3/syntax.css?1.6.0");
+ 
+    </style> 
+  </head> 
+  <body> 
+    <div class="body"> 
+      <div class="content"> 
+        <div class="topbar"> 
+          <a href="../">Overview</a> 
+          <b><a href="../ex/">Examples</a></b> 
+          <a href="../api/">Documentation</a> 
+          <a href="http://github.com/mbostock/d3/archives/master">Download</a> 
+        </div> 
+        <div class="sidebar"> 
+          <h1>d3.js</h1> 
+        </div> 
+ 
+<h1 id='streamgraph'>Streamgraph</h1> 
+<div class='gallery' id='chart'> 
+  <button class='first last' onclick='transition()'> 
+    Update
+  </button><p /> 
+</div><link href='http://mbostock.github.com/d3/ex/stream.css' rel='stylesheet' type='text/css' />
+<link href='http://mbostock.github.com/d3/ex/button.css' rel='stylesheet' type='text/css' />
+<script src='http://mbostock.github.com/d3/d3.layout.js?1.29.1' type='text/javascript'> </script>
+<script>
+    
+    
+    /* Inspired by Lee Byron's test data generator. */
+    function stream_layers(n, m, o) {
+      if (arguments.length < 3) o = 0;
+      function bump(a) {
+        var x = 1 / (.1 + Math.random()),
+            y = 2 * Math.random() - .5,
+            z = 10 / (.1 + Math.random());
+        for (var i = 0; i < m; i++) {
+          var w = (i / m - y) * z;
+          a[i] += x * Math.exp(-w * w);
+        }
+      }
+      return d3.range(n).map(function() {
+          var a = [], i;
+          for (i = 0; i < m; i++) a[i] = o + o * Math.random();
+          for (i = 0; i < 5; i++) bump(a);
+          return a.map(stream_index);
+        });
+    }
+
+    /* Another layer generator using gamma distributions. */
+    function stream_waves(n, m) {
+      return d3.range(n).map(function(i) {
+        return d3.range(m).map(function(j) {
+            var x = 20 * j / m - i / 3;
+            return 2 * x * Math.exp(-.5 * x);
+          }).map(stream_index);
+        });
+    }
+
+    function stream_index(d, i) {
+      return {x: i, y: Math.max(0, d)};
+    }
+    
+</script>
+<script>
+    
+    
+    var n = 10, // number of layers
+        m = 200, // number of samples per layer
+        data0 = d3.layout.stack().offset("wiggle")(stream_layers(n, m)),
+        data1 = d3.layout.stack().offset("wiggle")(stream_layers(n, m)),
+        color = d3.interpolateRgb("#aad", "#556");
+console.log(data0);
+    var w = 960,
+        h = 500,
+        mx = m - 1,
+        my = d3.max(data0.concat(data1), function(d) {
+          return d3.max(d, function(d) {
+            return d.y0 + d.y;
+          });
+        });
+
+    var area = d3.svg.area()
+        .x(function(d) { return d.x * w / mx; })
+        .y0(function(d) { return h - d.y0 * h / my; })
+        .y1(function(d) { return h - (d.y + d.y0) * h / my; });
+
+    var vis = d3.select("#chart")
+      .append("svg:svg")
+        .attr("width", w)
+        .attr("height", h);
+
+    vis.selectAll("path")
+        .data(data0)
+      .enter().append("svg:path")
+        .style("fill", function() { return color(Math.random()); })
+        .attr("d", area);
+
+    function transition() {
+      d3.selectAll("path")
+          .data(function() {
+            var d = data1;
+            data1 = data0;
+            return data0 = d;
+          })
+        .transition()
+          .duration(2500)
+          .attr("d", area);
+    }
+    
+</script> 
+<p>Streamgraph algorithm, colors, and data generation inspired by <a href='http://www.leebyron.com/else/streamgraph/'>Byron and Wattenberg</a>.</p> 
+ 
+<h3 id='source_code'>Source Code</h3> 
+<div class='highlight'><pre><code class='js'><span class='lineno'> 1</span> <span class='kd'>var</span> <span class='nx'>n</span> <span class='o'>=</span> <span class='mi'>20</span><span class='p'>,</span> <span class='c1'>// number of layers</span> 
+<span class='lineno'> 2</span>     <span class='nx'>m</span> <span class='o'>=</span> <span class='mi'>200</span><span class='p'>,</span> <span class='c1'>// number of samples per layer</span> 
+<span class='lineno'> 3</span>     <span class='nx'>data0</span> <span class='o'>=</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>layout</span><span class='p'>.</span><span class='nx'>stack</span><span class='p'>().</span><span class='nx'>offset</span><span class='p'>(</span><span class='s2'>&quot;wiggle&quot;</span><span class='p'>)(</span><span class='nx'>stream_layers</span><span class='p'>(</span><span class='nx'>n</span><span class='p'>,</span> <span class='nx'>m</span><span class='p'>)),</span> 
+<span class='lineno'> 4</span>     <span class='nx'>data1</span> <span class='o'>=</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>layout</span><span class='p'>.</span><span class='nx'>stack</span><span class='p'>().</span><span class='nx'>offset</span><span class='p'>(</span><span class='s2'>&quot;wiggle&quot;</span><span class='p'>)(</span><span class='nx'>stream_layers</span><span class='p'>(</span><span class='nx'>n</span><span class='p'>,</span> <span class='nx'>m</span><span class='p'>)),</span> 
+<span class='lineno'> 5</span>     <span class='nx'>color</span> <span class='o'>=</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>interpolateRgb</span><span class='p'>(</span><span class='s2'>&quot;#aad&quot;</span><span class='p'>,</span> <span class='s2'>&quot;#556&quot;</span><span class='p'>);</span> 
+<span class='lineno'> 6</span> 
+<span class='lineno'> 7</span> <span class='kd'>var</span> <span class='nx'>w</span> <span class='o'>=</span> <span class='mi'>960</span><span class='p'>,</span> 
+<span class='lineno'> 8</span>     <span class='nx'>h</span> <span class='o'>=</span> <span class='mi'>500</span><span class='p'>,</span> 
+<span class='lineno'> 9</span>     <span class='nx'>mx</span> <span class='o'>=</span> <span class='nx'>m</span> <span class='o'>-</span> <span class='mi'>1</span><span class='p'>,</span> 
+<span class='lineno'>10</span>     <span class='nx'>my</span> <span class='o'>=</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>max</span><span class='p'>(</span><span class='nx'>data0</span><span class='p'>.</span><span class='nx'>concat</span><span class='p'>(</span><span class='nx'>data1</span><span class='p'>),</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>d</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'>11</span>       <span class='k'>return</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>max</span><span class='p'>(</span><span class='nx'>d</span><span class='p'>,</span> <span class='kd'>function</span><span class='p'>(</span><span class='nx'>d</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'>12</span>         <span class='k'>return</span> <span class='nx'>d</span><span class='p'>.</span><span class='nx'>y0</span> <span class='o'>+</span> <span class='nx'>d</span><span class='p'>.</span><span class='nx'>y</span><span class='p'>;</span> 
+<span class='lineno'>13</span>       <span class='p'>});</span> 
+<span class='lineno'>14</span>     <span class='p'>});</span> 
+<span class='lineno'>15</span> 
+<span class='lineno'>16</span> <span class='kd'>var</span> <span class='nx'>area</span> <span class='o'>=</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>svg</span><span class='p'>.</span><span class='nx'>area</span><span class='p'>()</span> 
+<span class='lineno'>17</span>     <span class='p'>.</span><span class='nx'>x</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>d</span><span class='p'>)</span> <span class='p'>{</span> <span class='k'>return</span> <span class='nx'>d</span><span class='p'>.</span><span class='nx'>x</span> <span class='o'>*</span> <span class='nx'>w</span> <span class='o'>/</span> <span class='nx'>mx</span><span class='p'>;</span> <span class='p'>})</span> 
+<span class='lineno'>18</span>     <span class='p'>.</span><span class='nx'>y0</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>d</span><span class='p'>)</span> <span class='p'>{</span> <span class='k'>return</span> <span class='nx'>h</span> <span class='o'>-</span> <span class='nx'>d</span><span class='p'>.</span><span class='nx'>y0</span> <span class='o'>*</span> <span class='nx'>h</span> <span class='o'>/</span> <span class='nx'>my</span><span class='p'>;</span> <span class='p'>})</span> 
+<span class='lineno'>19</span>     <span class='p'>.</span><span class='nx'>y1</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>d</span><span class='p'>)</span> <span class='p'>{</span> <span class='k'>return</span> <span class='nx'>h</span> <span class='o'>-</span> <span class='p'>(</span><span class='nx'>d</span><span class='p'>.</span><span class='nx'>y</span> <span class='o'>+</span> <span class='nx'>d</span><span class='p'>.</span><span class='nx'>y0</span><span class='p'>)</span> <span class='o'>*</span> <span class='nx'>h</span> <span class='o'>/</span> <span class='nx'>my</span><span class='p'>;</span> <span class='p'>});</span> 
+<span class='lineno'>20</span> 
+<span class='lineno'>21</span> <span class='kd'>var</span> <span class='nx'>vis</span> <span class='o'>=</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>select</span><span class='p'>(</span><span class='s2'>&quot;#chart&quot;</span><span class='p'>)</span> 
+<span class='lineno'>22</span>   <span class='p'>.</span><span class='nx'>append</span><span class='p'>(</span><span class='s2'>&quot;svg:svg&quot;</span><span class='p'>)</span> 
+<span class='lineno'>23</span>     <span class='p'>.</span><span class='nx'>attr</span><span class='p'>(</span><span class='s2'>&quot;width&quot;</span><span class='p'>,</span> <span class='nx'>w</span><span class='p'>)</span> 
+<span class='lineno'>24</span>     <span class='p'>.</span><span class='nx'>attr</span><span class='p'>(</span><span class='s2'>&quot;height&quot;</span><span class='p'>,</span> <span class='nx'>h</span><span class='p'>);</span> 
+<span class='lineno'>25</span> 
+<span class='lineno'>26</span> <span class='nx'>vis</span><span class='p'>.</span><span class='nx'>selectAll</span><span class='p'>(</span><span class='s2'>&quot;path&quot;</span><span class='p'>)</span> 
+<span class='lineno'>27</span>     <span class='p'>.</span><span class='nx'>data</span><span class='p'>(</span><span class='nx'>data0</span><span class='p'>)</span> 
+<span class='lineno'>28</span>   <span class='p'>.</span><span class='nx'>enter</span><span class='p'>().</span><span class='nx'>append</span><span class='p'>(</span><span class='s2'>&quot;svg:path&quot;</span><span class='p'>)</span> 
+<span class='lineno'>29</span>     <span class='p'>.</span><span class='nx'>style</span><span class='p'>(</span><span class='s2'>&quot;fill&quot;</span><span class='p'>,</span> <span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span> <span class='k'>return</span> <span class='nx'>color</span><span class='p'>(</span><span class='nb'>Math</span><span class='p'>.</span><span class='nx'>random</span><span class='p'>());</span> <span class='p'>})</span> 
+<span class='lineno'>30</span>     <span class='p'>.</span><span class='nx'>attr</span><span class='p'>(</span><span class='s2'>&quot;d&quot;</span><span class='p'>,</span> <span class='nx'>area</span><span class='p'>);</span> 
+<span class='lineno'>31</span> 
+<span class='lineno'>32</span> <span class='kd'>function</span> <span class='nx'>transition</span><span class='p'>()</span> <span class='p'>{</span> 
+<span class='lineno'>33</span>   <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>selectAll</span><span class='p'>(</span><span class='s2'>&quot;path&quot;</span><span class='p'>)</span> 
+<span class='lineno'>34</span>       <span class='p'>.</span><span class='nx'>data</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span> 
+<span class='lineno'>35</span>         <span class='kd'>var</span> <span class='nx'>d</span> <span class='o'>=</span> <span class='nx'>data1</span><span class='p'>;</span> 
+<span class='lineno'>36</span>         <span class='nx'>data1</span> <span class='o'>=</span> <span class='nx'>data0</span><span class='p'>;</span> 
+<span class='lineno'>37</span>         <span class='k'>return</span> <span class='nx'>data0</span> <span class='o'>=</span> <span class='nx'>d</span><span class='p'>;</span> 
+<span class='lineno'>38</span>       <span class='p'>})</span> 
+<span class='lineno'>39</span>     <span class='p'>.</span><span class='nx'>transition</span><span class='p'>()</span> 
+<span class='lineno'>40</span>       <span class='p'>.</span><span class='nx'>duration</span><span class='p'>(</span><span class='mi'>2500</span><span class='p'>)</span> 
+<span class='lineno'>41</span>       <span class='p'>.</span><span class='nx'>attr</span><span class='p'>(</span><span class='s2'>&quot;d&quot;</span><span class='p'>,</span> <span class='nx'>area</span><span class='p'>);</span> 
+<span class='lineno'>42</span> <span class='p'>}</span> 
+</code></pre> 
+</div><div class='highlight'><pre><code class='js'><span class='lineno'> 1</span> <span class='cm'>/* Inspired by Lee Byron&#39;s test data generator. */</span> 
+<span class='lineno'> 2</span> <span class='kd'>function</span> <span class='nx'>stream_layers</span><span class='p'>(</span><span class='nx'>n</span><span class='p'>,</span> <span class='nx'>m</span><span class='p'>,</span> <span class='nx'>o</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'> 3</span>   <span class='k'>if</span> <span class='p'>(</span><span class='nx'>arguments</span><span class='p'>.</span><span class='nx'>length</span> <span class='o'>&lt;</span> <span class='mi'>3</span><span class='p'>)</span> <span class='nx'>o</span> <span class='o'>=</span> <span class='mi'>0</span><span class='p'>;</span> 
+<span class='lineno'> 4</span>   <span class='kd'>function</span> <span class='nx'>bump</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'> 5</span>     <span class='kd'>var</span> <span class='nx'>x</span> <span class='o'>=</span> <span class='mi'>1</span> <span class='o'>/</span> <span class='p'>(.</span><span class='mi'>1</span> <span class='o'>+</span> <span class='nb'>Math</span><span class='p'>.</span><span class='nx'>random</span><span class='p'>()),</span> 
+<span class='lineno'> 6</span>         <span class='nx'>y</span> <span class='o'>=</span> <span class='mi'>2</span> <span class='o'>*</span> <span class='nb'>Math</span><span class='p'>.</span><span class='nx'>random</span><span class='p'>()</span> <span class='o'>-</span> <span class='p'>.</span><span class='mi'>5</span><span class='p'>,</span> 
+<span class='lineno'> 7</span>         <span class='nx'>z</span> <span class='o'>=</span> <span class='mi'>10</span> <span class='o'>/</span> <span class='p'>(.</span><span class='mi'>1</span> <span class='o'>+</span> <span class='nb'>Math</span><span class='p'>.</span><span class='nx'>random</span><span class='p'>());</span> 
+<span class='lineno'> 8</span>     <span class='k'>for</span> <span class='p'>(</span><span class='kd'>var</span> <span class='nx'>i</span> <span class='o'>=</span> <span class='mi'>0</span><span class='p'>;</span> <span class='nx'>i</span> <span class='o'>&lt;</span> <span class='nx'>m</span><span class='p'>;</span> <span class='nx'>i</span><span class='o'>++</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'> 9</span>       <span class='kd'>var</span> <span class='nx'>w</span> <span class='o'>=</span> <span class='p'>(</span><span class='nx'>i</span> <span class='o'>/</span> <span class='nx'>m</span> <span class='o'>-</span> <span class='nx'>y</span><span class='p'>)</span> <span class='o'>*</span> <span class='nx'>z</span><span class='p'>;</span> 
+<span class='lineno'>10</span>       <span class='nx'>a</span><span class='p'>[</span><span class='nx'>i</span><span class='p'>]</span> <span class='o'>+=</span> <span class='nx'>x</span> <span class='o'>*</span> <span class='nb'>Math</span><span class='p'>.</span><span class='nx'>exp</span><span class='p'>(</span><span class='o'>-</span><span class='nx'>w</span> <span class='o'>*</span> <span class='nx'>w</span><span class='p'>);</span> 
+<span class='lineno'>11</span>     <span class='p'>}</span> 
+<span class='lineno'>12</span>   <span class='p'>}</span> 
+<span class='lineno'>13</span>   <span class='k'>return</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>range</span><span class='p'>(</span><span class='nx'>n</span><span class='p'>).</span><span class='nx'>map</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>()</span> <span class='p'>{</span> 
+<span class='lineno'>14</span>       <span class='kd'>var</span> <span class='nx'>a</span> <span class='o'>=</span> <span class='p'>[],</span> <span class='nx'>i</span><span class='p'>;</span> 
+<span class='lineno'>15</span>       <span class='k'>for</span> <span class='p'>(</span><span class='nx'>i</span> <span class='o'>=</span> <span class='mi'>0</span><span class='p'>;</span> <span class='nx'>i</span> <span class='o'>&lt;</span> <span class='nx'>m</span><span class='p'>;</span> <span class='nx'>i</span><span class='o'>++</span><span class='p'>)</span> <span class='nx'>a</span><span class='p'>[</span><span class='nx'>i</span><span class='p'>]</span> <span class='o'>=</span> <span class='nx'>o</span> <span class='o'>+</span> <span class='nx'>o</span> <span class='o'>*</span> <span class='nb'>Math</span><span class='p'>.</span><span class='nx'>random</span><span class='p'>();</span> 
+<span class='lineno'>16</span>       <span class='k'>for</span> <span class='p'>(</span><span class='nx'>i</span> <span class='o'>=</span> <span class='mi'>0</span><span class='p'>;</span> <span class='nx'>i</span> <span class='o'>&lt;</span> <span class='mi'>5</span><span class='p'>;</span> <span class='nx'>i</span><span class='o'>++</span><span class='p'>)</span> <span class='nx'>bump</span><span class='p'>(</span><span class='nx'>a</span><span class='p'>);</span> 
+<span class='lineno'>17</span>       <span class='k'>return</span> <span class='nx'>a</span><span class='p'>.</span><span class='nx'>map</span><span class='p'>(</span><span class='nx'>stream_index</span><span class='p'>);</span> 
+<span class='lineno'>18</span>     <span class='p'>});</span> 
+<span class='lineno'>19</span> <span class='p'>}</span> 
+<span class='lineno'>20</span> 
+<span class='lineno'>21</span> <span class='cm'>/* Another layer generator using gamma distributions. */</span> 
+<span class='lineno'>22</span> <span class='kd'>function</span> <span class='nx'>stream_waves</span><span class='p'>(</span><span class='nx'>n</span><span class='p'>,</span> <span class='nx'>m</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'>23</span>   <span class='k'>return</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>range</span><span class='p'>(</span><span class='nx'>n</span><span class='p'>).</span><span class='nx'>map</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>i</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'>24</span>     <span class='k'>return</span> <span class='nx'>d3</span><span class='p'>.</span><span class='nx'>range</span><span class='p'>(</span><span class='nx'>m</span><span class='p'>).</span><span class='nx'>map</span><span class='p'>(</span><span class='kd'>function</span><span class='p'>(</span><span class='nx'>j</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'>25</span>         <span class='kd'>var</span> <span class='nx'>x</span> <span class='o'>=</span> <span class='mi'>20</span> <span class='o'>*</span> <span class='nx'>j</span> <span class='o'>/</span> <span class='nx'>m</span> <span class='o'>-</span> <span class='nx'>i</span> <span class='o'>/</span> <span class='mi'>3</span><span class='p'>;</span> 
+<span class='lineno'>26</span>         <span class='k'>return</span> <span class='mi'>2</span> <span class='o'>*</span> <span class='nx'>x</span> <span class='o'>*</span> <span class='nb'>Math</span><span class='p'>.</span><span class='nx'>exp</span><span class='p'>(</span><span class='o'>-</span><span class='p'>.</span><span class='mi'>5</span> <span class='o'>*</span> <span class='nx'>x</span><span class='p'>);</span> 
+<span class='lineno'>27</span>       <span class='p'>}).</span><span class='nx'>map</span><span class='p'>(</span><span class='nx'>stream_index</span><span class='p'>);</span> 
+<span class='lineno'>28</span>     <span class='p'>});</span> 
+<span class='lineno'>29</span> <span class='p'>}</span> 
+<span class='lineno'>30</span> 
+<span class='lineno'>31</span> <span class='kd'>function</span> <span class='nx'>stream_index</span><span class='p'>(</span><span class='nx'>d</span><span class='p'>,</span> <span class='nx'>i</span><span class='p'>)</span> <span class='p'>{</span> 
+<span class='lineno'>32</span>   <span class='k'>return</span> <span class='p'>{</span><span class='nx'>x</span><span class='o'>:</span> <span class='nx'>i</span><span class='p'>,</span> <span class='nx'>y</span><span class='o'>:</span> <span class='nb'>Math</span><span class='p'>.</span><span class='nx'>max</span><span class='p'>(</span><span class='mi'>0</span><span class='p'>,</span> <span class='nx'>d</span><span class='p'>)};</span> 
+<span class='lineno'>33</span> <span class='p'>}</span> 
+</code></pre> 
+</div> 
+ 
+      </div> 
+      <div class="foot">Copyright &copy; 2011 <a href="http://bost.ocks.org/mike">Mike Bostock</a></div> 
+    </div> 
+  </div> 
+  <a href="http://github.com/mbostock/d3"><img
+      style="position:absolute;top:0;right:0;border:0;"
+      width="149" height="149" src="../forkme.png" alt="Fork me on GitHub"
+      /></a> 
+  </body> 
+</html>

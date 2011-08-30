@@ -11,7 +11,7 @@ body:after {
     width: 50%; min-height: 100%;
 }
 .Map .map {
-    height: 500px;
+    width: 500px; height: 500px;
 }
     .Map circle {
         fill: #fff;

@@ -66,7 +66,7 @@
         model: Feature,
         
         parse: function (response) {
-            return response.features;
+            return response.features[0];
         }
         
     });
@@ -313,6 +313,7 @@
                 .zoom(13)
                 .container(container)
                 .add(po.image().url(url))
+                //.add(po.interact())
                 ;
             
             $groups = self.$('.Group-collection');
@@ -346,6 +347,7 @@
             self.features = self.model.features;
             self.map = self.options.map;
             self.layer = po.geoJson();
+            self.nodes = [];
             
             self.features.bind('reset', self.render);
             
@@ -377,10 +379,39 @@
             self.map
                 .add(self.layer)
                 ;
+            var test = self.features.toJSON();
             
             self.layer
                 .features(self.features.toJSON())
                 .on('load', self.load)
+                ;
+            
+            self.force = d3.layout.force()
+                .nodes(test)
+                .gravity(0)
+                .charge(0)
+                .size([500, 500])
+                .start()
+                ;
+            
+            self.nodes = d3.select(self.layer.container())
+                .selectAll('circle')
+                .data(test)
+                .call(self.force.drag)
+                ;
+            
+            self.force
+                .on('tick', function(){
+                    
+                    self.nodes
+                        .attr('transform', function(d, i){
+                            console.log(d.x);
+                            return 'translate(' + (3880.97 + d.x) + ', ' + (1334.5 + d.y) + ')';
+                        })
+                        ;
+
+                })
+                //.stop()
                 ;
             
             return self;
@@ -392,9 +423,12 @@
             
             _.each(e.features, function(f,i){
                 
+                self.nodes.push(f.element);
+                
                 new SvgFeatureView({
                     el: f.element,
-                    model: self.features.get(f.data.properties._id)
+                    model: self.features.get(f.data.properties._id),
+                    force: self.force
                 });
                 
             });
@@ -414,10 +448,12 @@
         
         initialize: function () {
             
-            var self = this;
+            var self = this,
+                force = 
             
             _.bindAll(self, 'toggle', 'mouseenter', 'mouseleave', 'select', 'deselect');
             
+            self.force = self.options.force;
             self.isSelected = false;
             
             self.model

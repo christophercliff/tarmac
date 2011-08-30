@@ -1,0 +1,290 @@
+
+<!DOCTYPE html> 
+<html> 
+  <head> 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"> 
+    <meta name="apple-mobile-web-app-capable" content="yes"> 
+    <title>Vector Formats</title> 
+    <link rel="stylesheet" href="http://openlayers.org/dev/theme/default/style.css" type="text/css"> 
+    <!--[if lte IE 6]>
+        <link rel="stylesheet" href="../theme/default/ie6-style.css" type="text/css" />
+    <![endif]--> 
+    <link rel="stylesheet" href="http://openlayers.org/dev/examples/style.css" type="text/css"> 
+    <style type="text/css"> 
+        input, select, textarea {
+            font: 0.9em Verdana, Arial, sans-serif;
+        }
+        #leftcol {
+            position: absolute;
+            top: 0;
+            left: 1em;
+            padding: 0;
+            width: 517px;
+        }
+        #map {
+            width: 512px;
+            height: 225px;
+            border: 1px solid #ccc;
+        }
+        #input {
+            width: 512px;
+        }
+        #text {
+            font-size: 0.85em;
+            margin: 1em 0 1em 0;
+            width: 100%;
+            height: 10em;
+        }
+        #info {
+            position: relative;
+            padding: 2em 0;
+            margin-left: 540px;
+        }
+        #output {
+            font-size: 0.8em;
+            width: 100%;
+            height: 512px;
+            border: 0;
+        }
+        p {
+            margin: 0;
+            padding: 0.75em 0 0.75em 0;
+        }
+    </style> 
+    <script src="javascripts/lib/openlayers.js"></script> 
+    <script type="text/javascript"> 
+        var map, vectors, formats;
+        function updateFormats() {
+            var in_options = {
+                'internalProjection': map.baseLayer.projection,
+                'externalProjection': new OpenLayers.Projection(OpenLayers.Util.getElement("inproj").value)
+            };   
+            var out_options = {
+                'internalProjection': map.baseLayer.projection,
+                'externalProjection': new OpenLayers.Projection(OpenLayers.Util.getElement("outproj").value)
+            };
+            var gmlOptions = {
+                featureType: "feature",
+                featureNS: "http://example.com/feature"
+            };
+            var gmlOptionsIn = OpenLayers.Util.extend(
+                OpenLayers.Util.extend({}, gmlOptions),
+                in_options
+            );
+            var gmlOptionsOut = OpenLayers.Util.extend(
+                OpenLayers.Util.extend({}, gmlOptions),
+                out_options
+            );
+            var kmlOptionsIn = OpenLayers.Util.extend(
+                {extractStyles: true}, in_options);
+            //console.log(in_options);
+            formats = {
+              'in': {
+                wkt: new OpenLayers.Format.WKT(in_options),
+                geojson: new OpenLayers.Format.GeoJSON(in_options),
+                georss: new OpenLayers.Format.GeoRSS(in_options),
+                gml2: new OpenLayers.Format.GML.v2(gmlOptionsIn),
+                gml3: new OpenLayers.Format.GML.v3(gmlOptionsIn),
+                kml: new OpenLayers.Format.KML(kmlOptionsIn),
+                atom: new OpenLayers.Format.Atom(in_options)
+              }, 
+              'out': {
+                wkt: new OpenLayers.Format.WKT(out_options),
+                geojson: new OpenLayers.Format.GeoJSON(out_options),
+                georss: new OpenLayers.Format.GeoRSS(out_options),
+                gml2: new OpenLayers.Format.GML.v2(gmlOptionsOut),
+                gml3: new OpenLayers.Format.GML.v3(gmlOptionsOut),
+                kml: new OpenLayers.Format.KML(out_options),
+                atom: new OpenLayers.Format.Atom(out_options)
+              } 
+            };
+        }
+        function init(){
+            map = new OpenLayers.Map('map');
+            /*var wms = new OpenLayers.Layer.WMS( "OpenLayers WMS",
+                "http://vmap0.tiles.osgeo.org/wms/vmap0?", {layers: 'basic'});*/
+ 
+                var wms = new OpenLayers.Layer.XYZ(
+                    "OpenAerialMap",
+                    'http://mt0.googleapis.com/vt?lyrs=t@127,r@158&src=apiv3&hl=en-US&x=${x}&y=${y}&z=${z}&s=Gali',
+                    {
+                        sphericalMercator: true
+                    }
+                );
+ 
+            vectors = new OpenLayers.Layer.Vector("Vector Layer");
+ 
+            map.addLayers([wms, vectors]);
+            map.addControl(new OpenLayers.Control.MousePosition());
+            map.addControl(new OpenLayers.Control.EditingToolbar(vectors));
+ 
+            var options = {
+                hover: true,
+                onSelect: serialize
+            };
+            var select = new OpenLayers.Control.SelectFeature(vectors, options);
+            map.addControl(select);
+            select.activate();
+            
+            updateFormats();
+ 
+            map.setCenter(new OpenLayers.LonLat(0, 0), 1);
+            
+            var data = {"type": "FeatureCollection", "features":[
+             {"type": "Feature", "geometry": {"type":"Point","coordinates":[-71.05253755225374,42.35563913983638]}, "properties": {"_id":"e8141967af9895da3d16138a931a4453","_rev":"1-c05a6e16c137dbe6adb0ce4903646a34","properties":{"neighborhood":"Back Bay"},"_attachments":{"awesome.jpeg":{"content_type":"image/jpeg","revpos":1,"digest":"md5-mG5o0ZZmrOuKFAjrXFCuDg==","length":125540,"stub":true}}}},
+             {"type": "Feature", "geometry": {"type":"Point","coordinates":[-71.08639492855832,42.3448741546063]}, "properties": {"_id":"e8141967af9895da3d16138a93424a57","_rev":"1-965c87f972a72f7507113e16cf18e3c6","properties":{"neighborhood":"Back Bay"},"_attachments":{"awesome.jpeg":{"content_type":"image/jpeg","revpos":1,"digest":"md5-mG5o0ZZmrOuKFAjrXFCuDg==","length":125540,"stub":true}}}},
+             {"type": "Feature", "geometry": {"type":"Point","coordinates":[-71.05095504893495,42.35505640229554]}, "properties": {"_id":"e8141967af9895da3d16138a93151c18","_rev":"1-be06d630949b96b13cf36f60793f4431","properties":{"neighborhood":"Back Bay"},"_attachments":{"awesome.jpeg":{"content_type":"image/jpeg","revpos":1,"digest":"md5-PHhnYN2T3wt9eQOXH2689w==","length":105328,"stub":true}}}},
+             {"type": "Feature", "geometry": {"type":"Point","coordinates":[-71.0517918981476,42.35986085247134]}, "properties": {"_id":"e8141967af9895da3d16138a931312cf","_rev":"1-83a894d045904525918e06a0c5e28acb","properties":{"neighborhood":"Back Bay"},"_attachments":{"awesome.jpeg":{"content_type":"image/jpeg","revpos":1,"digest":"md5-mG5o0ZZmrOuKFAjrXFCuDg==","length":125540,"stub":true}}}},
+             {"type": "Feature", "geometry": {"type":"Point","coordinates":[-71.0498972585831,42.35566296089346]}, "properties": {"_id":"e8141967af9895da3d16138a93051719","_rev":"1-de015003039e933a271f7e527d818be5","properties":{"neighborhood":"Back Bay"},"_attachments":{"awesome.jpeg":{"content_type":"image/jpeg","revpos":1,"digest":"md5-PHhnYN2T3wt9eQOXH2689w==","length":105328,"stub":true}}}},
+             {"type": "Feature", "geometry": {"type":"Point","coordinates":[-71.05025231017305,42.35895310908976]}, "properties": {"_id":"e8141967af9895da3d16138a931078b6","_rev":"1-f3716e69206ea0e1f555f63bba09ce1d","properties":{"neighborhood":"Back Bay"},"_attachments":{"awesome.jpeg":{"content_type":"image/jpeg","revpos":1,"digest":"md5-mG5o0ZZmrOuKFAjrXFCuDg==","length":125540,"stub":true}}}},
+             {"type": "Feature", "geometry": {"type":"Point","coordinates":[-71.05315709590911,42.35779636641356]}, "properties": {"_id":"cb85d486cf20ced0f52ab53e1f1cf86b","_rev":"1-5464cd377e7dd7d1783837e06aa6d9dd","properties":{"neighborhood":"Back Bay"},"_attachments":{"awesome.jpeg":{"content_type":"image/jpeg","revpos":1,"digest":"md5-PHhnYN2T3wt9eQOXH2689w==","length":105328,"stub":true}}}}]};
+
+            var format = new OpenLayers.Format.GeoJSON({
+                internalProjection: map.baseLayer.projection,
+                externalProjection: new OpenLayers.Projection('EPSG:4326')
+            });
+            var features = format.read(data);
+            var bounds;
+            if(features) {
+                if(features.constructor != Array) {
+                    features = [features];
+                }
+                for(var i=0; i<features.length; ++i) {
+                    if (!bounds) {
+                        bounds = features[i].geometry.getBounds();
+                    } else {
+                        bounds.extend(features[i].geometry.getBounds());
+                    }
+ 
+                }
+                vectors.addFeatures(features);
+                map.zoomToExtent(bounds);
+                
+            } else {
+                
+            }
+            
+            var modify = new OpenLayers.Control.DragFeature(vectors);
+            //console.log(modify);
+            map.addControl(modify);
+            //modify.mode = OpenLayers.Control.ModifyFeature.DRAG;
+            modify.activate();
+        }
+        
+        function report() {
+            
+            console.log(1);
+        }
+ 
+        function serialize(feature) {
+            var type = document.getElementById("formatType").value;
+            // second argument for pretty printing (geojson only)
+            var pretty = document.getElementById("prettyPrint").checked;
+            var str = formats['out'][type].write(feature, pretty);
+            // not a good idea in general, just for this demo
+            str = str.replace(/,/g, ', ');
+            document.getElementById('output').value = str;
+        }
+ 
+        function deserialize() {
+            var element = document.getElementById('text');
+            var type = document.getElementById("formatType").value;
+            console.log(type);
+            var features = formats['in'][type].read(element.value);
+            var bounds;
+            if(features) {
+                if(features.constructor != Array) {
+                    features = [features];
+                }
+                for(var i=0; i<features.length; ++i) {
+                    if (!bounds) {
+                        bounds = features[i].geometry.getBounds();
+                    } else {
+                        bounds.extend(features[i].geometry.getBounds());
+                    }
+ 
+                }
+                vectors.addFeatures(features);
+                //map.zoomToExtent(bounds);
+                var plural = (features.length > 1) ? 's' : '';
+                element.value = features.length + ' feature' + plural + ' added';
+            } else {
+                element.value = 'Bad input ' + type;
+            }
+        }
+ 
+        // preload images
+        (function() {
+            return;
+            var roots = ["draw_point", "draw_line", "draw_polygon", "pan"];
+            var onImages = [];
+            var offImages = [];
+            for(var i=0; i<roots.length; ++i) {
+                onImages[i] = new Image();
+                onImages[i].src = "../theme/default/img/" + roots[i] + "_on.png";
+                offImages[i] = new Image();
+                offImages[i].src = "../theme/default/img/" + roots[i] + "_on.png";
+            }
+        })();
+ 
+    </script> 
+  </head> 
+  <body onload="init()"> 
+    <div id="leftcol"> 
+        <h1 id="title">Vector Formats Example</h1> 
+ 
+        <div id="tags"> 
+            vector, geojson, atom, kml, georss, gml, wkt, advanced, spherical, mercator
+        </div> 
+        <p id="shortdesc"> 
+            Shows the wide variety of vector formats that open layers supports.
+        </p> 
+ 
+        <div id="map" class="smallmap"></div> 
+        <div id="input"> 
+            <p>Use the drop-down below to select the input/output format
+            for vector features.  New features can be added by using the drawing
+            tools above or by pasting their text representation below.</p> 
+            <label for="formatType">Format</label> 
+            <select name="formatType" id="formatType"> 
+                <option value="geojson" selected="selected">GeoJSON</option> 
+                <option value="atom">Atom</option> 
+                <option value="kml">KML</option> 
+                <option value="georss">GeoRSS</option> 
+                <option value="gml2">GML (v2)</option> 
+                <option value="gml3">GML (v3)</option> 
+                <option value="wkt">Well-Known Text (WKT)</option> 
+            </select> 
+            &nbsp;
+            <label for="prettyPrint">Pretty print</label> 
+            <input id="prettyPrint" type="checkbox"
+                   name="prettyPrint" value="1" /> 
+            <br> 
+            Input Projection: <select id="inproj" onchange='updateFormats()'> 
+              <option value="EPSG:4326" selected="selected">EPSG:4326</option> 
+              <option value="EPSG:900913">Spherical Mercator</option> 
+            </select> <br> 
+            Output Projection: <select id="outproj" onchange='updateFormats()'> 
+              <option value="EPSG:4326" selected="selected">EPSG:4326</option> 
+              <option value="EPSG:900913">Spherical Mercator</option> 
+            </select> 
+            <br> 
+            <textarea id="text">{"type": "Feature", "geometry": {"type":"Point","coordinates":[-71.05315709590911,42.35779636641356]}, "properties": {"_id":"cb85d486cf20ced0f52ab53e1f1cf86b","_rev":"1-5464cd377e7dd7d1783837e06aa6d9dd","properties":{"neighborhood":"Back Bay"},"_attachments":{"awesome.jpeg":{"content_type":"image/jpeg","revpos":1,"digest":"md5-PHhnYN2T3wt9eQOXH2689w==","length":105328,"stub":true}}}}</textarea> 
+            <br> 
+            <input type="button" value="add feature" onclick="deserialize();" /> 
+        </div> 
+ 
+        <div id="docs"> 
+        </div> 
+ 
+    </div> 
+    <div id="info"> 
+        <p>Use the tools to the left to draw new polygons, lines, and points.
+        After drawing some new features, hover over a feature to see the
+        serialized version below.</p> 
+        <textarea id="output"></textarea> 
+    </div> 
+ 
+  </body> 
+</html>
