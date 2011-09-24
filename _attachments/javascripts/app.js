@@ -26,10 +26,14 @@
         
         initialize: function () {
             
-            var self = this;
+            var self = this,
+                features = new Features();
             
-            self.features = new Features();
-            self.features.url = '/' + self.get('slug') + '/_design/geo/_spatiallist/geojson/pointsFull?bbox=-180%2C-90%2C180%2C90';
+            features.url = '/' + self.get('slug') + '/_design/geo/_spatiallist/geojson/full?bbox=-180%2C-90%2C180%2C90';
+            
+            self.set({
+                features: features
+            });
             
             return;
         }
@@ -48,6 +52,8 @@
         
     });
     
+    window.Map = Backbone.Model.extend({});
+    
     window.Feature = Backbone.Model.extend({
         
         initialize: function () {
@@ -55,6 +61,10 @@
             var self = this;
             
             self.id = self.get('properties')._id;
+            self.url ='/bicycle_parking/' + self.id;
+            self.set({
+                _rev: self.get('properties')._rev
+            });
             
             return;
         }
@@ -66,7 +76,7 @@
         model: Feature,
         
         parse: function (response) {
-            return response.features[0];
+            return response.features;
         }
         
     });
@@ -127,7 +137,7 @@
             _.bindAll(self, 'render');
             
             self.template = _.template($('#' + self.className).html());
-            self.features = self.model.features;
+            self.features = self.model.get('features');
             
             self.features.bind('reset', self.render);
             
@@ -141,11 +151,11 @@
             
             $(self.el).html(self.template(self.model.toJSON()));
             
-            $features = self.$('.Feature-collection');
+            $records = self.$('.Record-collection');
             
             self.features.each(function(model){
-                $features
-                    .append(new FeatureView({
+                $records
+                    .append(new RecordView({
                         model: model
                     }).render().el)
                     ;
@@ -176,12 +186,12 @@
         
     });
     
-    window.FeatureView = Backbone.View.extend({
+    window.RecordView = Backbone.View.extend({
         
-        className: 'Feature',
+        className: 'Record',
         
         events: {
-            'click.Feature .Feature-id': 'toggle'
+            'click.Record .Record-id': 'toggle'
         },
         
         initialize: function () {
@@ -276,78 +286,123 @@
             
             var self = this;
             
-            _.bindAll(self, 'render', 'renderCollection');
-            
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
-            self.map = org.polymaps.map();
+            self.model = new Map();
             
-            self.databases.bind('reset', self.renderCollection);
+            self.databases
+                .bind('reset', self.layers, self)
+                ;
+            
+            self.model
+                .bind('change', self.fit, self)
+                ;
             
             return;
         },
         
         render: function () {
             
-            var self = this;
+            var self = this,
+                $map;
             
             $(self.el).html(self.template({}));
+            
+            $map = self.$('.Map-map');
+            
+            $map
+                .css({
+                    height: $(window).height() + 'px'
+                })
+                ;
+            
+            self.map = new google.maps.Map($map.get(0), {
+                zoom: 8,
+                center: new google.maps.LatLng(42.37, -71.03),
+                mapTypeId: google.maps.MapTypeId.TERRAIN
+            });
+            
+            self.resize();
             
             return self;
         },
         
-        renderCollection: function () {
+        layers: function () {
+            
+            var self = this;
+            
+            self.databases.each(function(database){
+                new LayerView({
+                    model: database,
+                    map: self.map,
+                    mapModel: self.model
+                });
+            });
+            
+            return;
+        },
+        
+        fit: function () {
             
             var self = this,
-                $groups = self.$('.Group-collection');
-                po = org.polymaps,
-                container = self.el.appendChild(po.svg('svg')),
-                url = po.url('http://mt0.googleapis.com/vt?lyrs=t@127,r@158&src=apiv3&hl=en-US&x={X}&y={Y}&z={Z}&s=Gali');
-                //url = po.url('http://{S}tile.cloudmade.com' + '/854bf27409ba4b129dd49f137020299b' + '/32111/256/{Z}/{X}/{Y}.png').hosts(['a.', 'b.', 'c.', '']);
+                bounds = new google.maps.LatLngBounds();
             
-            self.map
-                .center({
-                    lat: 42.35779636641356,
-                    lon: -71.05315709590911
-                })
-                .zoom(13)
-                .container(container)
-                .add(po.image().url(url))
-                //.add(po.interact())
-                ;
-            
-            $groups = self.$('.Group-collection');
-            
-            self.databases.each(function(model){
-                $groups
-                    .append(new GroupView({
-                        model: model,
-                        map: self.map
-                    }).render().el)
-                    ;
+            self.databases.each(function(database){
+                database.get('features').each(function(feature){
+                    var coords = feature.get('geometry').coordinates;
+                    bounds.extend(new google.maps.LatLng(coords[1], coords[0]));
+                });
             });
+            
+            self.map.fitBounds(bounds);
+            
+            return;
+        },
+        
+        resize: function () {
+            
+            var self = this,
+                $map = self.$('.Map-map'),
+                $window = $(window);
+            
+            if ($map.length < 1)
+            {
+                return;
+            }
+            
+            $window
+                .bind('resize.' + self.className, _.throttle(function(){
+                    
+                    $map
+                        .css({
+                            height: $window.height() + 'px'
+                        })
+                        ;
+                    
+                    google.maps.event.trigger(self.map, 'resize');
+                    
+                }, 100))
+                ;
             
             return;
         }
         
     });
     
-    window.GroupView = Backbone.View.extend({
+    window.LayerView = Backbone.View.extend({
         
-        className: 'Group',
+        className: 'Layer',
         
         initialize: function () {
             
-            var self = this,
-                po = org.polymaps;
+            var self = this;
             
-            _.bindAll(self, 'render', 'load');
+            _.bindAll(self, 'render');
             
-            self.template = _.template($('#' + self.className).html());
-            self.features = self.model.features;
             self.map = self.options.map;
-            self.layer = po.geoJson();
-            self.nodes = [];
+            self.features = self.model.get('features');
+            self.mapFeatures = []; // Container for removing batch features
+            self.mapModel = self.options.mapModel;
             
             self.features.bind('reset', self.render);
             
@@ -357,206 +412,66 @@
         render: function () {
             
             var self = this,
-                $markers;
+                geo = {
+                    type: 'FeatureCollection',
+                    features: self.features.toJSON()
+                },
+                opts = {
+                    draggable: true
+                };
             
-            $(self.el).html(self.template(self.model.toJSON()));
-            
-            $markers = self.$('.Marker-collection');
-            
-            self.features.each(function(model){
-                $markers
-                    .append(new MarkerView({
-                        model: model
-                    }).render().el)
-                    ;
-            });
-            
-            if (!self.map.container())
+            if (self.features.length < self.mapFeatures.length)
             {
-                return self;
+                self.remove();
             }
             
-            self.map
-                .add(self.layer)
-                ;
-            var test = self.features.toJSON();
+            self.mapFeatures = new GeoJSON(geo, opts);
             
-            self.layer
-                .features(self.features.toJSON())
-                .on('load', self.load)
-                ;
+            self.features.each(function(feature, i){
+                new FeatureView({
+                    model: feature,
+                    map: self.map,
+                    feature: self.mapFeatures[i]
+                }).render();
+            });
             
-            self.force = d3.layout.force()
-                .nodes(test)
-                .gravity(0)
-                .charge(0)
-                .size([500, 500])
-                .start()
-                ;
-            
-            self.nodes = d3.select(self.layer.container())
-                .selectAll('circle')
-                .data(test)
-                .call(self.force.drag)
-                ;
-            
-            self.force
-                .on('tick', function(){
-                    
-                    self.nodes
-                        .attr('transform', function(d, i){
-                            console.log(d.x);
-                            return 'translate(' + (3880.97 + d.x) + ', ' + (1334.5 + d.y) + ')';
-                        })
-                        ;
-
-                })
-                //.stop()
+            self.mapModel
+                .trigger('change')
                 ;
             
             return self;
         },
         
-        load: function (e) {
+        remove: function () {
             
             var self = this;
             
-            _.each(e.features, function(f,i){
-                
-                self.nodes.push(f.element);
-                
-                new SvgFeatureView({
-                    el: f.element,
-                    model: self.features.get(f.data.properties._id),
-                    force: self.force
-                });
-                
-            });
+            for (var i = 0, l = self.mapFeatures.length; i < l; i++)
+            {
+                self.mapFeatures[i].setMap();
+            }
             
             return;
         }
         
     });
     
-    window.SvgFeatureView = Backbone.View.extend({
+    window.FeatureView = Backbone.View.extend({
+        
+        className: 'Feature',
         
         events: {
-            'click': 'toggle',
-            'mouseenter': 'mouseenter',
-            'mouseleave': 'mouseleave'
-        },
-        
-        initialize: function () {
             
-            var self = this,
-                force = 
-            
-            _.bindAll(self, 'toggle', 'mouseenter', 'mouseleave', 'select', 'deselect');
-            
-            self.force = self.options.force;
-            self.isSelected = false;
-            
-            self.model
-                .bind('select', self.select)
-                .bind('deselect', self.deselect)
-                ;
-            
-            return;
-        },
-        
-        toggle: function () {
-            
-            var self = this;
-            
-            if (self.isSelected)
-            {
-                self.model.trigger('deselect');
-                
-                return;
-            }
-            
-            self.model.trigger('select');
-            
-            return;
-        },
-        
-        mouseenter: function () {
-            
-            var self = this;
-            
-            self.el
-                .setAttribute('r', 6.5)
-                ;
-            
-            return;
-        },
-        
-        mouseleave: function () {
-            
-            var self = this;
-            
-            self.el
-                .setAttribute('r', 4.5)
-                ;
-            
-            return;
-        },
-        
-        select: function () {
-            
-            var self = this;
-            
-            if (self.isSelected)
-            {
-                return;
-            }
-            
-            self.isSelected = true;
-            
-            return;
-        },
-        
-        deselect: function () {
-            
-            var self = this;
-            
-            if (!self.isSelected)
-            {
-                return;
-            }
-            
-            self.isSelected = false;
-            
-            return;
-        }
-        
-    });
-    
-    window.MarkerView = Backbone.View.extend({
-        
-        className: 'Marker',
-        
-        events: {
-            'click .Marker-id': 'toggle',
-            'submit form': 'submit'
         },
         
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'select', 'deselect', 'submit');
+            _.bindAll(self, 'render', 'update');
             
-            self.template = _.template($('#' + self.className).html());
-            self.editor = new EditorView({
-                model: self.model
-            });
-            self.isSelected = false;
-            
-            self.model
-                .bind('select', self.select)
-                .bind('deselect', self.deselect)
-                ;
+            self.map = self.options.map;
+            self.feature = self.options.feature;
             
             return;
         },
@@ -565,85 +480,27 @@
             
             var self = this;
             
-            $(self.el).html(self.template(self.model.toJSON()));
+            self.feature.setMap(self.map)
+            
+            google.maps.event.addListener(self.feature, 'dragend', self.update);
             
             return self;
         },
         
-        toggle: function () {
+        update: function (e) {
             
             var self = this;
             
-            if (self.isSelected)
-            {
-                self.model.trigger('deselect');
-                
-                return;
-            }
+            var geometry = self.model.get('geometry');
             
-            self.model.trigger('select');
+            geometry.coordinates = [e.latLng.lng(), e.latLng.lat()];
             
-            return;
-        },
-        
-        select: function (e) {
-            
-            var self = this;
-            
-            if (self.isSelected)
-            {
-                return;
-            }
-            
-            self.isSelected = true;
-            
-            self.$('.' + self.className + '-id')
-                .css({
-                    fontWeight: 'bold'
+            self.model
+                .set({
+                    geometry: geometry
                 })
+                .save()
                 ;
-            
-            $(self.el)
-                .append(self.editor.render().el)
-                ;
-            
-            return;
-        },
-        
-        deselect: function () {
-            
-            var self = this;
-            
-            if (!self.isSelected)
-            {
-                return;
-            }
-            
-            self.isSelected = false;
-            
-            self.$('.' + self.className + '-id')
-                .css({
-                    fontWeight: 'normal'
-                })
-                ;
-            
-            self.$('.Editor')
-                .remove()
-                ;
-            
-            return;
-        },
-        
-        submit: function (e) {
-            e.preventDefault();
-            
-            var self = this;
-            
-            self.model.set({
-                geometry: self.$('form').serializeObject()
-            });
-            
-            self.model.trigger('deselect');
             
             return;
         }
