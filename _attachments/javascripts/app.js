@@ -60,14 +60,20 @@
             
             var self = this;
             
+            self.url ='/bicycle_parking/';
+            
+            if (!self.has('properties'))
+            {
+                return;
+            }
+            
             self.id = self.get('properties')._id;
             self.url ='/bicycle_parking/' + self.id;
-            self.set({
-                _rev: self.get('properties')._rev
-            });
+            self.set(self.get('properties'));
+            self.unset('properties');
             
             return;
-        }
+        },
         
     });
     
@@ -127,7 +133,8 @@
         
         events: {
             'click .fetch-features': 'fetchFeatures',
-            'click .clear-features': 'clearFeatures'
+            'click .clear-features': 'clearFeatures',
+            'click .add-feature': 'addFeature'
         },
         
         initialize: function () {
@@ -169,7 +176,9 @@
             
             var self = this;
             
-            self.features.fetch();
+            self.features
+                .fetch()
+                ;
             
             return;
         },
@@ -179,7 +188,27 @@
             
             var self = this;
             
-            self.features.reset([]);
+            self.features
+                .reset([])
+                ;
+            
+            return;
+        },
+        
+        addFeature: function (e) {
+            e.preventDefault();
+            
+            var self = this;
+            
+            self.features
+                .add({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Point',
+                        coordinates: []
+                    }
+                })
+                ;
             
             return;
         }
@@ -397,14 +426,17 @@
             
             var self = this;
             
-            _.bindAll(self, 'render');
+            _.bindAll(self, 'render', 'add');
             
             self.map = self.options.map;
             self.features = self.model.get('features');
             self.mapFeatures = []; // Container for removing batch features
             self.mapModel = self.options.mapModel;
             
-            self.features.bind('reset', self.render);
+            self.features
+                .bind('reset', self.render)
+                .bind('add', self.add)
+                ;
             
             return;
         },
@@ -422,7 +454,7 @@
             
             if (self.features.length < self.mapFeatures.length)
             {
-                self.remove();
+                self.clear();
             }
             
             self.mapFeatures = new GeoJSON(geo, opts);
@@ -442,7 +474,7 @@
             return self;
         },
         
-        remove: function () {
+        clear: function () {
             
             var self = this;
             
@@ -450,6 +482,50 @@
             {
                 self.mapFeatures[i].setMap();
             }
+            
+            return;
+        },
+        
+        add: function (feature) {
+            
+            var self = this,
+                geo = feature.get('geometry'),
+                center = self.map.getCenter();
+            
+            geo.coordinates = [center.lng(), center.lat()];
+            
+            feature
+                .set({
+                    geometry: geo
+                })
+                ;
+            
+            feature
+                .save(null, {
+                    success: function (model, response) {
+                        
+                        feature.url = feature.url + feature.id;
+                        
+                        feature
+                            .set({
+                                _rev: response.rev
+                            })
+                            .unset('ok')
+                            ;
+                    }
+                })
+                ;
+            
+            new FeatureView({
+                model: feature,
+                map: self.map,
+                feature: new GeoJSON({
+                    type: 'FeatureCollection',
+                    features: [feature.toJSON()]
+                }, {
+                    draggable: true
+                })[0]
+            }).render();
             
             return;
         }
@@ -499,7 +575,18 @@
                 .set({
                     geometry: geometry
                 })
-                .save()
+                .save(null, {
+                    success: function (model, response) {
+                        
+                        model
+                            .set({
+                                _rev: response.rev
+                            })
+                            .unset('ok')
+                            ;
+                        
+                    }
+                })
                 ;
             
             return;
