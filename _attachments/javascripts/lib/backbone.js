@@ -1077,7 +1077,14 @@
     if (params.type !== 'GET' && !Backbone.emulateJSON) {
       params.processData = false;
     }
-
+    
+    if (method == 'delete')
+    {
+        var $db = $.couch.db('bicycle_parking');
+        $db.removeDoc(model.toJSON());
+        return;
+    }
+    
     // Make the request.
     return $.ajax(params);
   };

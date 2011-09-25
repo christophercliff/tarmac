@@ -73,7 +73,7 @@
             self.unset('properties');
             
             return;
-        },
+        }
         
     });
     
@@ -505,10 +505,12 @@
                     success: function (model, response) {
                         
                         feature.url = feature.url + feature.id;
+                        feature.id = response.id;
                         
                         feature
                             .set({
-                                _rev: response.rev
+                                _rev: response.rev,
+                                _id: response.id
                             })
                             .unset('ok')
                             ;
@@ -544,7 +546,7 @@
             
             var self = this;
             
-            _.bindAll(self, 'render', 'update');
+            _.bindAll(self, 'render', 'update', 'remove');
             
             self.map = self.options.map;
             self.feature = self.options.feature;
@@ -556,9 +558,10 @@
             
             var self = this;
             
-            self.feature.setMap(self.map)
+            self.feature.setMap(self.map);
             
             google.maps.event.addListener(self.feature, 'dragend', self.update);
+            google.maps.event.addListener(self.feature, 'dblclick', self.remove);
             
             return self;
         },
@@ -587,6 +590,19 @@
                         
                     }
                 })
+                ;
+            
+            return;
+        },
+        
+        remove: function () {
+            
+            var self = this;
+            
+            self.feature.setMap();
+            
+            self.model
+                .destroy()
                 ;
             
             return;
