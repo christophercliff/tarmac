@@ -1080,7 +1080,7 @@
     
     if (method == 'delete')
     {
-        var $db = $.couch.db('bicycle_parking');
+        var $db = $.couch.db(model.get('database'));
         $db.removeDoc(model.toJSON());
         return;
     }

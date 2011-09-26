@@ -60,15 +60,12 @@
             
             var self = this;
             
-            self.url ='/bicycle_parking/';
-            
             if (!self.has('properties'))
             {
                 return;
             }
             
             self.id = self.get('properties')._id;
-            self.url ='/bicycle_parking/' + self.id;
             self.set(self.get('properties'));
             self.unset('properties');
             
@@ -91,16 +88,23 @@
         
         className: 'Tray',
         
+        events: {
+            'click .add-database': 'renderDatabaser'
+        },
+        
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'render');
+            _.bindAll(self, 'render', 'addDatabase');
             
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
             
-            self.databases.bind('reset', self.render)
+            self.databases
+                .bind('reset', self.render)
+                .bind('add', self.addDatabase)
+                ;
             
             return;
         },
@@ -123,6 +127,33 @@
             });
             
             return self;
+        },
+        
+        renderDatabaser: function (e) {
+            e.preventDefault();
+            
+            var self = this;
+            
+            $(self.el)
+                .prepend(new DatabaserView({
+                    databases: self.databases
+                }).render().el)
+                ;
+            
+            return;
+        },
+        
+        addDatabase: function (model) {
+            
+            var self = this;
+            
+            self.$('.Database-collection')
+                .prepend(new DatabaseView({
+                    model: model
+                }).render().el)
+                ;
+            
+            return;
         }
         
     });
@@ -134,19 +165,22 @@
         events: {
             'click .fetch-features': 'fetchFeatures',
             'click .clear-features': 'clearFeatures',
-            'click .add-feature': 'addFeature'
+            'click .add-feature': 'addFeature',
+            'click .delete-database': 'deleteDatabase'
         },
         
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'render');
+            _.bindAll(self, 'render', 'renderFeature');
             
             self.template = _.template($('#' + self.className).html());
             self.features = self.model.get('features');
             
-            self.features.bind('reset', self.render);
+            self.features
+                .bind('reset', self.render)
+                ;
             
             return;
         },
@@ -154,13 +188,19 @@
         render: function () {
             
             var self = this,
-                $features;
+                $records;
             
             $(self.el).html(self.template(self.model.toJSON()));
             
             $records = self.$('.Record-collection');
             
             self.features.each(function(model){
+                
+                model.url = '/' + self.model.get('slug') + '/' + model.id;
+                model.set({
+                    database: self.model.get('slug')
+                });
+                
                 $records
                     .append(new RecordView({
                         model: model
@@ -169,6 +209,20 @@
             });
             
             return self;
+        },
+        
+        renderFeature: function (model) {
+            
+            var self = this,
+                $records = self.$('.Record-collection');
+            
+            $records
+                .append(new RecordView({
+                    model: model
+                }).render().el)
+                ;
+            
+            return;
         },
         
         fetchFeatures: function (e) {
@@ -202,6 +256,7 @@
             
             self.features
                 .add({
+                    database: self.model.get('slug'),
                     type: 'Feature',
                     geometry: {
                         type: 'Point',
@@ -209,6 +264,93 @@
                     }
                 })
                 ;
+            
+            return;
+        },
+        
+        deleteDatabase: function (e) {
+            e.preventDefault();
+            
+            var self = this;
+            
+            $.couch.db(self.model.get('slug')).drop();
+            $.couch.db('tarmac').removeDoc(self.model.toJSON());
+            
+            self.remove();
+            
+            return;
+        }
+        
+    });
+    
+    window.DatabaserView = Backbone.View.extend({
+        
+        className: 'Databaser',
+        
+        events: {
+            'submit .Databaser-form': 'submit',
+            'click .Databaser-cancel': 'cancel'
+        },
+        
+        initialize: function () {
+            
+            var self = this;
+            
+            self.template = _.template($('#' + self.className).html());
+            self.databases = self.options.databases;
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this;
+            
+            $(self.el).html(self.template({}));
+            
+            return self;
+        },
+        
+        submit: function (e) {
+            e.preventDefault();
+            
+            var self = this,
+                $form = self.$('form'),
+                name = $form.find('[name="name"]').val(),
+                slug = $form.find('[name="slug"]').val(),
+                obj = {
+                    type: 'database',
+                    name: name,
+                    slug: slug
+                };
+            
+            if (slug === undefined || name === undefined)
+            {
+                return;
+            }
+            
+            self.remove();
+            self.databases.add(obj);
+            
+            $.couch.db(slug).create({
+                success: function () {
+                    $.couch.db('tarmac').saveDoc(obj, {
+                        success: function () {
+                            $.couch.replicate('tarmac', slug, null, { doc_ids: ['_design/geo'] })
+                        }
+                    });
+                }
+            });
+            
+            return;
+        },
+        
+        cancel: function (e) {
+            e.preventDefault();
+            
+            var self = this;
+            
+            self.remove();
             
             return;
         }
@@ -220,14 +362,14 @@
         className: 'Record',
         
         events: {
-            'click.Record .Record-id': 'toggle'
+            'click .Record-id': 'toggle'
         },
         
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'toggle', 'select', 'deselect');
+            _.bindAll(self, 'render', 'toggle', 'select', 'deselect');
             
             self.template = _.template($('#' + self.className).html());
             self.isSelected = false;
@@ -315,16 +457,22 @@
             
             var self = this;
             
+            _.bindAll(self, 'layers', 'fit', 'addLayer');
+            
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
             self.model = new Map();
             
             self.databases
-                .bind('reset', self.layers, self)
+                .bind('reset', self.layers)
                 ;
             
             self.model
-                .bind('change', self.fit, self)
+                .bind('change', self.fit)
+                ;
+            
+            self.databases
+                .bind('add', self.addLayer)
                 ;
             
             return;
@@ -361,11 +509,20 @@
             var self = this;
             
             self.databases.each(function(database){
-                new LayerView({
-                    model: database,
-                    map: self.map,
-                    mapModel: self.model
-                });
+                self.addLayer(database);
+            });
+            
+            return;
+        },
+        
+        addLayer: function (database) {
+            
+            var self = this;
+            
+            new LayerView({
+                model: database,
+                map: self.map,
+                mapModel: self.model
             });
             
             return;
@@ -494,6 +651,7 @@
             
             geo.coordinates = [center.lng(), center.lat()];
             
+            feature.url = '/' + feature.get('database') + '/';
             feature
                 .set({
                     geometry: geo
@@ -604,6 +762,8 @@
             self.model
                 .destroy()
                 ;
+            
+            self.model.trigger('remove');
             
             return;
         }
