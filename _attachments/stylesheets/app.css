@@ -5,6 +5,7 @@ body:after {
 .Tray {
     position: absolute; left: 0; top: 0;
     width: 350px; height: 100%; overflow: auto;
+    background-color: #fdfdfd;
 }
     .Tray-name {
         padding: 120px 30px 30px;
@@ -54,16 +55,15 @@ body:after {
                 }
 
 .Document-collection {
-    padding: 15px 10px;
+    padding: 15px 30px;
     color: #666;
     background-color: #eee;
 }
     .Document {
-        padding: 2px 3px;
+        
     }
         .Document-id {
-            padding: 5px 10px;
-            border-radius: 10px;
+            padding: 5px 0;
             font-family: Monaco;
             font-size: 12px; line-height: 12px;
         }

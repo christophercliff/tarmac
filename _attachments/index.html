@@ -69,15 +69,18 @@
             <div class="Database-name"><%= name %></div>
             
             <ul class="Database-operation-collection">
-                <li class="Database-operation">
-                    <button class="Database-operation-a fetch-features">Show</button>
-                </li>
-                <li class="Database-operation">
-                    <button class="Database-operation-a clear-features" >Hide</button>
-                </li>
-                <li class="Database-operation">
-                    <button class="Database-operation-a add-feature">Add</button>
-                </li>
+                <% if (!isVisible) { %>
+                    <li class="Database-operation">
+                        <button class="Database-operation-a fetch-features">Show</button>
+                    </li>
+                <% } else { %>
+                    <li class="Database-operation">
+                        <button class="Database-operation-a clear-features" >Hide</button>
+                    </li>
+                    <li class="Database-operation">
+                        <button class="Database-operation-a add-feature">Add</button>
+                    </li>
+                <% } %>
                 <li class="Database-operation">
                     <button class="Database-operation-a delete-database">Delete Database</button>
                 </li>

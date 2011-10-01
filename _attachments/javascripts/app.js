@@ -24,6 +24,10 @@
     
     window.Database = Backbone.Model.extend({
         
+        defaults: {
+            isVisible: false
+        },
+        
         initialize: function () {
             
             var self = this,
@@ -177,13 +181,14 @@
             
             var self = this;
             
-            _.bindAll(self, 'render', 'renderFeature', 'handleAdd');
+            _.bindAll(self, 'render', 'renderFeature', 'handleAddFeature');
             
             self.template = _.template($('#' + self.className).html());
             self.features = self.model.get('features');
             
             self.features
                 .bind('reset', self.render)
+                .bind('add', self.handleAddFeature)
                 ;
             
             return;
@@ -192,11 +197,11 @@
         render: function () {
             
             var self = this,
-                $records;
+                $documents;
             
             $(self.el).html(self.template(self.model.toJSON()));
             
-            $records = self.$('.Document-collection');
+            $documents = self.$('.Document-collection');
             
             self.features.each(function(model){
                 
@@ -205,7 +210,7 @@
                     database: self.model.get('slug')
                 });
                 
-                $records
+                $documents
                     .append(new DocumentView({
                         model: model
                     }).render().el)
@@ -213,20 +218,6 @@
             });
             
             return self;
-        },
-        
-        renderFeature: function (model) {
-            
-            var self = this,
-                $records = self.$('.Document-collection');
-            
-            $records
-                .append(new DocumentView({
-                    model: model
-                }).render().el)
-                ;
-            
-            return;
         },
         
         fetchFeatures: function (e) {
@@ -253,8 +244,7 @@
             return;
         },
         
-        addFeature: function (e) {
-            e.preventDefault();
+        addFeature: function () {
             
             var self = this;
             
@@ -267,6 +257,20 @@
                         coordinates: []
                     }
                 })
+                ;
+            
+            return;
+        },
+        
+        handleAddFeature: function (model) {
+            
+            var self = this,
+                $documents = self.$('.Document-collection');
+            
+            $documents
+                .prepend(new DocumentView({
+                    model: model
+                }).render().el)
                 ;
             
             return;
@@ -381,6 +385,7 @@
             self.model
                 .bind('select', self.select)
                 .bind('deselect', self.deselect)
+                .bind('loaded', self.render)
                 ;
             
             return;
@@ -677,6 +682,7 @@
                                 _id: response.id
                             })
                             .unset('ok')
+                            .trigger('loaded')
                             ;
                     }
                 })
