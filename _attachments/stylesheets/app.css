@@ -4,7 +4,7 @@ body:after {
 
 .Tray {
     position: absolute; left: 0; top: 0;
-    width: 350px; height: 100%;
+    width: 350px; height: 100%; overflow: auto;
 }
     .Tray-name {
         padding: 120px 30px 30px;
@@ -13,7 +13,7 @@ body:after {
         font-size: 14px; line-height: 14px;
     }
     .Tray-operation-collection {
-        position: absolute; right: 5px; top: 5px;
+        position: absolute; right: 10px; top: 10px;
         font-size: 10px; line-height: 10px;
     }
     .Tray-operation-collection:after {
@@ -33,15 +33,14 @@ body:after {
         position: relative;
     }
         .Database-name {
-            padding: 30px;
+            padding: 40px 30px 20px;
             color: #666;
             background-color: #f7f7f7;
             border-bottom: solid 1px #ddd;
             font-size: 14px; line-height: 14px; font-weight: bold;
-            cursor: pointer;
         }
         .Database-operation-collection {
-            position: absolute; right: 5px; top: 5px;
+            position: absolute; right: 10px; top: 10px;
             font-size: 10px; line-height: 10px;
         }
         .Database-operation-collection:after {
@@ -72,6 +71,7 @@ body:after {
 .Map {
     position: absolute; right: 0; top: 0;
     height: 100%;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.20);
 }
     .Map-map {
         

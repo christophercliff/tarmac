@@ -56,6 +56,10 @@
     
     window.Feature = Backbone.Model.extend({
         
+        defaults: {
+            _id: ''
+        },
+        
         initialize: function () {
             
             var self = this;
@@ -173,7 +177,7 @@
             
             var self = this;
             
-            _.bindAll(self, 'render', 'renderFeature');
+            _.bindAll(self, 'render', 'renderFeature', 'handleAdd');
             
             self.template = _.template($('#' + self.className).html());
             self.features = self.model.get('features');
@@ -838,8 +842,9 @@
             
             var self = this;
             
-            document.body.appendChild(self.mapView.render().el);
+            
             document.body.appendChild(self.trayView.render().el);
+            document.body.appendChild(self.mapView.render().el);
             
             window.databases.fetch();
             
