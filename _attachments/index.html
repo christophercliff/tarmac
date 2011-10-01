@@ -69,20 +69,17 @@
             <div class="Database-name"><%= name %></div>
             
             <ul class="Database-operation-collection">
-                <% if (!isVisible) { %>
-                    <li class="Database-operation">
-                        <button class="Database-operation-a fetch-features">Show</button>
-                    </li>
-                <% } else { %>
-                    <li class="Database-operation">
-                        <button class="Database-operation-a clear-features" >Hide</button>
-                    </li>
-                    <li class="Database-operation">
-                        <button class="Database-operation-a add-feature">Add</button>
-                    </li>
-                <% } %>
                 <li class="Database-operation">
-                    <button class="Database-operation-a delete-database">Delete Database</button>
+                    <button class="Database-operation-a fetch-features">Show</button>
+                </li>
+                <li class="Database-operation">
+                    <button class="Database-operation-a clear-features" >Hide</button>
+                </li>
+                <li class="Database-operation">
+                    <button class="Database-operation-a add-feature">Add</button>
+                </li>
+                <li class="Database-operation">
+                    <button class="Database-operation-a delete-database">Delete</button>
                 </li>
             </ul>
             
@@ -107,7 +104,11 @@
         
         <script id="Document" type="text/template">
             
-            <div class="Document-id"><%= _id %></div>
+            <% if (isReady) { %>
+                <div class="Document-id"><%= _id %></div>
+            <% } else { %>
+                <div class="Document-id">Loading...</div>
+            <% } %>
             
         </script>
         

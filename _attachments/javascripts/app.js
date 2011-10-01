@@ -61,7 +61,8 @@
     window.Feature = Backbone.Model.extend({
         
         defaults: {
-            _id: ''
+            _id: '',
+            isReady: true
         },
         
         initialize: function () {
@@ -250,6 +251,7 @@
             
             self.features
                 .add({
+                    isReady: false,
                     database: self.model.get('slug'),
                     type: 'Feature',
                     geometry: {
@@ -385,7 +387,8 @@
             self.model
                 .bind('select', self.select)
                 .bind('deselect', self.deselect)
-                .bind('loaded', self.render)
+                .bind('ready', self.render)
+                .bind('destroy', self.remove, self)
                 ;
             
             return;
@@ -679,11 +682,13 @@
                         feature
                             .set({
                                 _rev: response.rev,
-                                _id: response.id
+                                _id: response.id,
+                                isReady: true
                             })
                             .unset('ok')
-                            .trigger('loaded')
+                            .trigger('ready')
                             ;
+                        
                     }
                 })
                 ;
@@ -772,10 +777,9 @@
             self.feature.setMap();
             
             self.model
+                .trigger('destroy')
                 .destroy()
                 ;
-            
-            self.model.trigger('remove');
             
             return;
         }

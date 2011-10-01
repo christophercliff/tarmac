@@ -37,6 +37,7 @@ body:after {
             padding: 40px 30px 20px;
             color: #666;
             background-color: #f7f7f7;
+            border-top: solid 1px #fff;
             border-bottom: solid 1px #ddd;
             font-size: 14px; line-height: 14px; font-weight: bold;
         }
