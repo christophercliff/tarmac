@@ -192,7 +192,7 @@
             
             $(self.el).html(self.template(self.model.toJSON()));
             
-            $records = self.$('.Record-collection');
+            $records = self.$('.Document-collection');
             
             self.features.each(function(model){
                 
@@ -202,7 +202,7 @@
                 });
                 
                 $records
-                    .append(new RecordView({
+                    .append(new DocumentView({
                         model: model
                     }).render().el)
                     ;
@@ -214,10 +214,10 @@
         renderFeature: function (model) {
             
             var self = this,
-                $records = self.$('.Record-collection');
+                $records = self.$('.Document-collection');
             
             $records
-                .append(new RecordView({
+                .append(new DocumentView({
                     model: model
                 }).render().el)
                 ;
@@ -357,12 +357,12 @@
         
     });
     
-    window.RecordView = Backbone.View.extend({
+    window.DocumentView = Backbone.View.extend({
         
-        className: 'Record',
+        className: 'Document',
         
         events: {
-            'click .Record-id': 'toggle'
+            'click .Document-id': 'toggle'
         },
         
         initialize: function () {
@@ -481,7 +481,8 @@
         render: function () {
             
             var self = this,
-                $map;
+                $map,
+                $win = $(window);
             
             $(self.el).html(self.template({}));
             
@@ -489,7 +490,8 @@
             
             $map
                 .css({
-                    height: $(window).height() + 'px'
+                    width: $win.width() - 350 + 'px',
+                    height: $win.height() + 'px'
                 })
                 ;
             

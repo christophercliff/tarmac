@@ -1,14 +1,77 @@
 body:after {
     clear: both;
 }
+
 .Tray {
-    float: right;
-    width: 50%; min-height: 100%;
+    position: absolute; left: 0; top: 0;
+    width: 350px; height: 100%;
 }
+    .Tray-name {
+        padding: 120px 30px 30px;
+        color: #999;
+        border-bottom: solid 1px #eee;
+        font-size: 14px; line-height: 14px;
+    }
+    .Tray-operation-collection {
+        position: absolute; right: 5px; top: 5px;
+        font-size: 10px; line-height: 10px;
+    }
+    .Tray-operation-collection:after {
+        clear: both;
+    }
+        .Tray-operation-collection {
+            display: inline;
+        }
+            .Tray-operation-collection {
+                float: left;
+            }
+
+.Database-collection {
+    
+}
+    .Database {
+        position: relative;
+    }
+        .Database-name {
+            padding: 30px;
+            color: #666;
+            background-color: #f7f7f7;
+            border-bottom: solid 1px #ddd;
+            font-size: 14px; line-height: 14px; font-weight: bold;
+            cursor: pointer;
+        }
+        .Database-operation-collection {
+            position: absolute; right: 5px; top: 5px;
+            font-size: 10px; line-height: 10px;
+        }
+        .Database-operation-collection:after {
+            clear: both;
+        }
+            .Database-operation {
+                display: inline;
+            }
+                .Database-operation-a {
+                    display: block; float: left;
+                }
+
+.Document-collection {
+    padding: 15px 10px;
+    color: #666;
+    background-color: #eee;
+}
+    .Document {
+        padding: 2px 3px;
+    }
+        .Document-id {
+            padding: 5px 10px;
+            border-radius: 10px;
+            font-family: Monaco;
+            font-size: 12px; line-height: 12px;
+        }
+
 .Map {
-    position: relative;
-    float: right;
-    width: 50%; min-height: 100%;
+    position: absolute; right: 0; top: 0;
+    height: 100%;
 }
     .Map-map {
         
