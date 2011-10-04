@@ -143,8 +143,8 @@
             
             var self = this;
             
-            $(self.el)
-                .prepend(new DatabaserView({
+            self.$('.Database-collection')
+                .before(new DatabaserView({
                     databases: self.databases
                 }).render().el)
                 ;
@@ -204,6 +204,12 @@
             
             $documents = self.$('.Document-collection');
             
+            $documents
+                .after(new ButtonView({
+                    model: self.model
+                }).render().el)
+                ;
+            
             self.features.each(function(model){
                 
                 model.url = '/' + self.model.get('slug') + '/' + model.id;
@@ -226,6 +232,10 @@
             
             var self = this;
             
+            self.model.set({
+                isVisible: true
+            });
+            
             self.features
                 .fetch()
                 ;
@@ -237,6 +247,10 @@
             e.preventDefault();
             
             var self = this;
+            
+            self.model.set({
+                isVisible: false
+            });
             
             self.features
                 .reset([])
@@ -288,7 +302,41 @@
             
             self.remove();
             
+            self.features.reset([]);
+            
             return;
+        }
+        
+    });
+    
+    window.ButtonView = Backbone.View.extend({
+        
+        className: 'Database-operation-collection',
+        
+        tagName: 'ul',
+        
+        initialize: function () {
+            
+            var self = this;
+            
+            self.template = _.template($('#' + self.className).html());
+            
+            self.model
+                .bind('change', self.render, self)
+                ;
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this;
+            
+            $(self.el).html(self.template({
+                isVisible: self.model.get('isVisible')
+            }));
+            
+            return self;
         }
         
     });
@@ -404,7 +452,7 @@
         },
         
         toggle: function () {
-            
+            return;
             var self = this;
             
             if (self.isSelected)
@@ -554,6 +602,14 @@
                 });
             });
             
+            if (bounds.isEmpty())
+            {
+                self.map.setCenter(new google.maps.LatLng(42.37, -71.03));
+                self.map.setZoom(8);
+                
+                return;
+            }
+            
             self.map.fitBounds(bounds);
             
             return;
@@ -623,10 +679,7 @@
                     draggable: true
                 };
             
-            if (self.features.length < self.mapFeatures.length)
-            {
-                self.clear();
-            }
+            self.clear();
             
             self.mapFeatures = new GeoJSON(geo, opts);
             
@@ -661,7 +714,8 @@
             
             var self = this,
                 geo = feature.get('geometry'),
-                center = self.map.getCenter();
+                center = self.map.getCenter(),
+                mapFeature;
             
             geo.coordinates = [center.lng(), center.lat()];
             
@@ -686,23 +740,39 @@
                                 isReady: true
                             })
                             .unset('ok')
+                            .unset('rev')
                             .trigger('ready')
+                            .save(null, {
+                                success: function (model, r) {
+                                    feature
+                                        .set({
+                                            _rev: r.rev
+                                        })
+                                        .unset('ok')
+                                        .unset('rev')
+                                        ;
+                                }
+                            })
                             ;
                         
                     }
                 })
                 ;
             
+            mapFeature = new GeoJSON({
+                type: 'FeatureCollection',
+                features: [feature.toJSON()]
+            }, {
+                draggable: true
+            })[0]
+            
             new FeatureView({
                 model: feature,
                 map: self.map,
-                feature: new GeoJSON({
-                    type: 'FeatureCollection',
-                    features: [feature.toJSON()]
-                }, {
-                    draggable: true
-                })[0]
+                feature: mapFeature
             }).render();
+            
+            self.mapFeatures.push(mapFeature);
             
             return;
         }
@@ -864,53 +934,9 @@
     });
     
     window.databases = new Databases();
-    //window.databases.reset([{name:'bicycle_parking'},{name:'bus_stops'}]);
     
     $(function(){
         new Tarmac();
     });
-    
-    /*Backbone.sync = function (method, model, options) {
-        
-        if (method === 'create' || method === 'update')
-        {
-            console.log(1);
-            //Backbone.couchConnector.create(model, options.success, options.error);
-        }
-        else if (method === 'read')
-        {
-            // Decide whether to read a whole collection or just one specific model
-            if (model.collection)
-            {
-                
-            } else {
-                
-            }
-                Backbone.couchConnector.readModel(model, options.success, options.error);
-            else
-                Backbone.couchConnector.readCollection(model, options.success, options.error);
-        }
-        else if (method === 'delete')
-        {
-            Backbone.couchConnector.del(model, options.success, options.error);
-        }  
-    }*/
-    
-    $.fn.serializeObject = function()
-    {
-        var o = {};
-        var a = this.serializeArray();
-        $.each(a, function() {
-            if (o[this.name] !== undefined) {
-                if (!o[this.name].push) {
-                    o[this.name] = [o[this.name]];
-                }
-                o[this.name].push(this.value || '');
-            } else {
-                o[this.name] = this.value || '';
-            }
-        });
-        return o;
-    };
     
 })(window);
