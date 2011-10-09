@@ -200,14 +200,6 @@
                 context.stroke();
               }
 
-              if (counter < opts.count) {
-                var link = document.createElement('a');
-                link.innerHTML = canvas.id + '-' + (counter + 1);
-                link.href = canvas.toDataURL();
-                document.body.appendChild(link);
-              counter += 1;
-              }
-
               timer = setTimeout(frame, delay);
             })();
             
