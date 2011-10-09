@@ -63,7 +63,7 @@ body:after {
                     display: block; float: left;
                 }
         .Database canvas {
-            position: absolute; left: 30px; top: 82px;
+            position: absolute; left: 6px; top: 40px;
         }
 
 .Document-collection {
