@@ -36,10 +36,51 @@
             features.url = '/' + self.get('slug') + '/_design/geo/_spatiallist/geojson/full?bbox=-180%2C-90%2C180%2C90';
             
             self.set({
-                features: features
+                features: features,
+                image: self.image()
             });
             
             return;
+        },
+        
+        image: function () {
+            
+            var self = this,
+                canvas = document.createElement('canvas'),
+                ctx = canvas.getContext('2d'),
+                i = Math.floor(Math.random()*35)*10 + 2;
+            
+            canvas.width = 21;
+            canvas.height = 36;
+            
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(20.0, 10.5);
+            ctx.bezierCurveTo(20.0, 15.1, 17.8, 16.0, 14.3, 22.1);
+            ctx.bezierCurveTo(10.8, 28.1, 10.7, 34.9, 10.7, 34.9);
+            ctx.lineTo(10.3, 34.9);
+            ctx.bezierCurveTo(10.3, 34.9, 10.1, 28.1, 6.7, 22.1);
+            ctx.bezierCurveTo(3.2, 16.0, 1.0, 15.1, 1.0, 10.5);
+            ctx.bezierCurveTo(1.0, 5.2, 5.2, 1.0, 10.5, 1.0);
+            ctx.bezierCurveTo(15.7, 1.0, 20.0, 5.2, 20.0, 10.5);
+            ctx.closePath();
+            ctx.fillStyle = 'hsl(' + i + ', 84%, 70%)';
+            ctx.fill();
+            ctx.strokeStyle = 'hsl(' + (i - 2) + ', 48%, 42%)';
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(13.4, 11.0);
+            ctx.bezierCurveTo(13.4, 12.6, 12.1, 13.9, 10.5, 13.9);
+            ctx.bezierCurveTo(8.9, 13.9, 7.5, 12.6, 7.5, 11.0);
+            ctx.bezierCurveTo(7.5, 9.3, 8.9, 8.0, 10.5, 8.0);
+            ctx.bezierCurveTo(12.1, 8.0, 13.4, 9.3, 13.4, 11.0);
+            ctx.closePath();
+            ctx.fillStyle = 'rgb(0, 0, 0)';
+            ctx.fill();
+            ctx.restore();
+            
+            return canvas.toDataURL();
         }
         
     });
@@ -236,8 +277,22 @@
                 isVisible: true
             });
             
-            self.features
-                .fetch()
+            self.$('.' + self.className + '-loading')
+                .animate({
+                    opacity: 1.00
+                }, 250)
+                ;
+            
+            self.$('.' + self.className + '-loader')
+                .animate({
+                    height: '22px'
+                }, 250, function(){
+                    
+                    self.features
+                        .fetch()
+                        ;
+                    
+                })
                 ;
             
             return;
@@ -676,7 +731,9 @@
                     features: self.features.toJSON()
                 },
                 opts = {
-                    draggable: true
+                    draggable: true,
+                    icon: self.model.get('image'),
+                    shadow: new google.maps.MarkerImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAiCAYAAADYmxC7AAAABGdBTUEAAK/INwWK6QAAAlBJREFUWMPtmF1v0zAUhuPEWwel2iaYQAju+Alc86v3P5C44AIJTXwIMY2htqyMlibmnOkxOrISFrNM2kUsvXLiNPbT9xwfq/UhhOKuNX/niEaoEWqEGqFGqBGqvTlpbcP0oeO+CMkB7AcGcUlfdrwWTN/EOSKcHwDIgpTIXqdwVyBGtYVTMH9DZ8pEOl+FPGOVAS8MyFb02yg+y3MqcaY0i+8Y7Zo+QlqnItBadCn6yZwbdUyX8P/hkHVFF94zukc/4dmuccwRphoAhVmK5salq+c+06EIM2HxKXqA7gMWgaqO8Gm4VnzWcb+OYcwJXwTSiWaifdEB/QygCaHzSdLbMhDdmjCuIVxYeJ/hUsXCh6JHoiOgZgmMMznkWmpT4HnNO1WyI3s5FYH2AHoqesL11ISpTIDaalNcXBP9FyG84HpLqepdEqJLD4E6AigNU1eRtHUp5tO56FR0JvrBeFbxdDh1gKbG+r4w0R115pvoK5qTV3VORbdHQmlC9S93bLXesLMuADhD33FMHWrs+dfXqS0TLPlWM3ugtuysGpAVO+sczbm/BLYJLb+Gr4XSl2QD1iyg3/AxSb4DhGsJ0ZIQneLIwrjyN6G71uzllLyvh+WaxVY4YYthPDbm5MknoJaM19eBZEOZ8NRJXjWEQRf/LDrBnUUfR4aAclTzfWpTw/n1RfRO9FGdEoZtccOWc/ZpnXpGjSoIlcK8Jdc2YaC/cHKKp8K8oF5piF6L3muOac4VA7YcqJei56IPomPNo3BLf271hXqFS2+E47i45fYHvJb9HKBaYW8AAAAASUVORK5CYII=', new google.maps.Size(37, 34), new google.maps.Point(0,0), new google.maps.Point(10, 34))
                 };
             
             self.clear();
@@ -763,8 +820,10 @@
                 type: 'FeatureCollection',
                 features: [feature.toJSON()]
             }, {
-                draggable: true
-            })[0]
+                draggable: true,
+                icon: self.model.get('image'),
+                shadow: new google.maps.MarkerImage('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACUAAAAiCAYAAADYmxC7AAAABGdBTUEAAK/INwWK6QAAAlBJREFUWMPtmF1v0zAUhuPEWwel2iaYQAju+Alc86v3P5C44AIJTXwIMY2htqyMlibmnOkxOrISFrNM2kUsvXLiNPbT9xwfq/UhhOKuNX/niEaoEWqEGqFGqBGqvTlpbcP0oeO+CMkB7AcGcUlfdrwWTN/EOSKcHwDIgpTIXqdwVyBGtYVTMH9DZ8pEOl+FPGOVAS8MyFb02yg+y3MqcaY0i+8Y7Zo+QlqnItBadCn6yZwbdUyX8P/hkHVFF94zukc/4dmuccwRphoAhVmK5salq+c+06EIM2HxKXqA7gMWgaqO8Gm4VnzWcb+OYcwJXwTSiWaifdEB/QygCaHzSdLbMhDdmjCuIVxYeJ/hUsXCh6JHoiOgZgmMMznkWmpT4HnNO1WyI3s5FYH2AHoqesL11ISpTIDaalNcXBP9FyG84HpLqepdEqJLD4E6AigNU1eRtHUp5tO56FR0JvrBeFbxdDh1gKbG+r4w0R115pvoK5qTV3VORbdHQmlC9S93bLXesLMuADhD33FMHWrs+dfXqS0TLPlWM3ugtuysGpAVO+sczbm/BLYJLb+Gr4XSl2QD1iyg3/AxSb4DhGsJ0ZIQneLIwrjyN6G71uzllLyvh+WaxVY4YYthPDbm5MknoJaM19eBZEOZ8NRJXjWEQRf/LDrBnUUfR4aAclTzfWpTw/n1RfRO9FGdEoZtccOWc/ZpnXpGjSoIlcK8Jdc2YaC/cHKKp8K8oF5piF6L3muOac4VA7YcqJei56IPomPNo3BLf271hXqFS2+E47i45fYHvJb9HKBaYW8AAAAASUVORK5CYII=', new google.maps.Size(37, 34), new google.maps.Point(0,0), new google.maps.Point(10, 34))
+            })[0];
             
             new FeatureView({
                 model: feature,
