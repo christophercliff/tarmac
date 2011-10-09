@@ -62,17 +62,9 @@ body:after {
                 .Database-operation-a {
                     display: block; float: left;
                 }
-        .Database-loader {
-            height: 0; overflow: hidden;
-            color: #666;
-            background-color: #eee;
+        .Database canvas {
+            position: absolute; left: 30px; top: 82px;
         }
-            .Database-loading {
-                padding: 5px 30px;
-                font-family: Monaco;
-                font-size: 12px; line-height: 12px;
-                opacity: 0.00;
-            }
 
 .Document-collection {
     padding: 15px 30px;

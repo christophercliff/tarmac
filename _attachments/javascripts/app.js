@@ -134,6 +134,88 @@
         
     });
     
+    window.SpinnerView = Backbone.View.extend({
+        
+        className: 'Spinner',
+        
+        tagName: 'canvas',
+        
+        options: {
+            width: 1.35,
+            height: 1.35,
+            scale: 1,
+            inner: 4,
+            outer: 7.18,
+            color: '#090909',
+            count: 12,
+            speed: 2
+        },
+        
+        initialize: function () {
+            
+            var self = this;
+            
+            
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this,
+                opts = self.options,
+                delay = 1000/(opts.speed || 2)/opts.count,
+                center = Math.ceil(opts.outer + opts.width),
+                canvas = self.el,
+                context;
+            
+            canvas.height = canvas.width = center*2;
+            context = canvas.getContext('2d');
+            context.lineWidth = opts.width;
+            context.lineCap = 'round';
+            context.strokeStyle = opts.color;
+            
+            var lowestOpacity = 0.18
+            var sectors = [];
+            var opacity = [];
+            for (var i = 0; i < opts.count; i++) {
+              var a = 2 * Math.PI / opts.count * i - Math.PI / 2;
+              var cos = Math.cos(a);
+              var sin = Math.sin(a);
+              sectors[i] = [opts.inner * cos, opts.inner * sin, opts.outer * cos, opts.outer * sin];
+              opacity[i] = Math.pow(i / (opts.count - 1), 1.8) * (1 - lowestOpacity) + lowestOpacity;
+            }
+            
+            var timer;
+            var counter = 0;
+            
+            (function frame() {
+              context.clearRect(0, 0, canvas.width, canvas.height);
+              opacity.unshift(opacity.pop());
+              for (var i = 0; i < opts.count; i++) {
+                context.globalAlpha = opacity[i];
+                context.beginPath();
+                context.moveTo(center + sectors[i][0], center + sectors[i][1]);
+                context.lineTo(center + sectors[i][2], center + sectors[i][3]);
+                context.stroke();
+              }
+
+              if (counter < opts.count) {
+                var link = document.createElement('a');
+                link.innerHTML = canvas.id + '-' + (counter + 1);
+                link.href = canvas.toDataURL();
+                document.body.appendChild(link);
+              counter += 1;
+              }
+
+              timer = setTimeout(frame, delay);
+            })();
+            
+            return self;
+        }
+        
+    });
+    
     window.TrayView = Backbone.View.extend({
         
         className: 'Tray',
@@ -245,8 +327,8 @@
             
             $documents = self.$('.Document-collection');
             
-            $documents
-                .after(new ButtonView({
+            $(self.el)
+                .append(new ButtonView({
                     model: self.model
                 }).render().el)
                 ;
@@ -277,22 +359,13 @@
                 isVisible: true
             });
             
-            self.$('.' + self.className + '-loading')
-                .animate({
-                    opacity: 1.00
-                }, 250)
+            $(self.el)
+                .append(new SpinnerView().render().el)
                 ;
             
-            self.$('.' + self.className + '-loader')
-                .animate({
-                    height: '22px'
-                }, 250, function(){
-                    
-                    self.features
-                        .fetch()
-                        ;
-                    
-                })
+            self.features
+                .trigger('fetch')
+                .fetch()
                 ;
             
             return;
