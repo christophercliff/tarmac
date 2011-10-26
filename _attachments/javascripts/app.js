@@ -48,7 +48,7 @@
             var self = this,
                 canvas = document.createElement('canvas'),
                 ctx = canvas.getContext('2d'),
-                i = Math.floor(Math.random()*35)*10 + 2;
+                i = Math.floor(Math.random()*12)*20 + 2;
             
             self.set({
                 color: 'hsl(' + i + ', 84%, 70%)'
@@ -266,11 +266,9 @@
             
             var self = this;
             
-            self.$('.Database-collection')
-                .before(new DatabaserView({
-                    databases: self.databases
-                }).render().el)
-                ;
+            document.body.appendChild(new DialogView({
+                databases: self.databases
+            }).render().el);
             
             return;
         },
@@ -1023,6 +1021,45 @@
             var self = this;
             
             self.model.trigger('deselect');
+            
+            return;
+        }
+        
+    });
+    
+    window.DialogView = Backbone.View.extend({
+        
+        className: 'Dialog',
+        
+        events: {
+            'click': 'close'
+        },
+        
+        initialize: function () {
+            
+            var self = this;
+            
+            _.bindAll(self, 'close');
+            
+            self.template = _.template($('#' + self.className).html());
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this;
+            
+            $(self.el).html(self.template({}));
+            
+            return self;
+        },
+        
+        close: function () {
+            
+            var self = this;
+            
+            self.remove();
             
             return;
         }

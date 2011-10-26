@@ -17,15 +17,27 @@ body:after {
         position: absolute; right: 10px; top: 10px;
         font-size: 10px; line-height: 10px;
     }
-    .Tray-operation-collection:after {
-        clear: both;
-    }
-        .Tray-operation-collection {
-            display: inline;
+        .Tray-operation {
+            position: relative;
+            display: inline-block;
+            width: 44px; height: 27px; overflow: hidden;
+            padding: 0; margin-left: -1px;
+            color: #999;
+            background-image: -moz-linear-gradient(50% 0%, #f5f5f5, #f1f1f1);
+            border: solid 1px #d9d9d9;
+            border-radius: 1px;
+            font-size: 10px; line-height: 27px; text-align: center;
+            text-shadow: -1px 1px 0 #fff;
+            cursor: pointer;
         }
-            .Tray-operation-collection {
-                float: left;
-            }
+        .Tray-operation:hover {
+            position: relative; z-index: 2;
+            border-color: #c0c0c0;
+        }
+        .Tray-operation:active {
+            border-color: #aaa;
+            box-shadow: inset 0 1px 5px 0 #999;
+        }
 
 .Databaser {
     padding: 20px 30px;
@@ -36,7 +48,7 @@ body:after {
     }
 
 .Database-collection {
-    
+    padding-bottom: 108px;
 }
     .Database {
         position: relative;
@@ -57,7 +69,7 @@ body:after {
                 display: inline-block;
                 width: 44px; height: 27px; overflow: hidden;
                 padding: 0; margin-left: -1px;
-                background-color: -moz-linear-gradient(50% 0%, #eee, #e0e0e0);
+                background-image: -moz-linear-gradient(50% 0%, #f5f5f5, #f1f1f1);
                 border: solid 1px #d9d9d9;
                 border-radius: 1px;
                 cursor: pointer;
@@ -69,10 +81,12 @@ body:after {
             .Database-operation:active {
                 border-color: #aaa;
                 box-shadow: inset 0 1px 5px 0 #999;
+                background: -moz-linear-gradient(50% 0%, #eee, #e0e0e0);
             }
             .Database-operation-selected {
                 border-color: #bbb;
                 box-shadow: inset 0 1px 5px 0 #ccc;
+                background: -moz-linear-gradient(50% 0%, #eee, #e0e0e0);
             }
                 .Database-operation span {
                     position: absolute; left: 50%; top: 50%;
@@ -84,18 +98,20 @@ body:after {
                 }
                 .Database-operation:active span {
                     background-color: #aaa;
+                    box-shadow: inset 0 1px 1px 0 #999, 0 1px 1px 0 #fff;
                 }
                 .Database-operation-selected span {
                     box-shadow: inset 0 1px 1px 0 #999, 0 1px 1px 0 #fff;
                 }
         .Database-content {
             background-color: #eee;
+            /*background: url('../images/whitey.png');*/
         }
         .Database-content-visible {
             padding: 16px 0;
         }
         .Database canvas {
-            position: absolute; right: 62px; top: 16px;
+            position: absolute; right: 62px; top: 20px;
         }
 
 .Document-collection {
@@ -125,3 +141,16 @@ body:after {
 .Group-collection {
     position: absolute; right: 100%;
 }
+
+.Dialog {
+    position: fixed; left: 0; top: 0; z-index: 1000;
+    width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.75);
+}
+    .Dialog-content {
+        position: fixed; left: 50%; top: 50%;
+        width: 600px; height: 400px;
+        margin: -200px 0 0 -300px;
+        background-color: #000;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.50);
+    }
