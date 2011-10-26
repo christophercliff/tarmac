@@ -50,6 +50,10 @@
                 ctx = canvas.getContext('2d'),
                 i = Math.floor(Math.random()*35)*10 + 2;
             
+            self.set({
+                color: 'hsl(' + i + ', 84%, 70%)'
+            });
+            
             canvas.width = 21;
             canvas.height = 36;
             
@@ -93,6 +97,10 @@
         
         parse: function (response) {
             return _.pluck(response.rows, 'value');
+        },
+        
+        comparator: function (model) {
+            return model.get('name');
         }
         
     });
@@ -433,7 +441,7 @@
         
         className: 'Database-operation-collection',
         
-        tagName: 'ul',
+        tagName: 'div',
         
         initialize: function () {
             
@@ -453,7 +461,8 @@
             var self = this;
             
             $(self.el).html(self.template({
-                isVisible: self.model.get('isVisible')
+                isVisible: self.model.get('isVisible'),
+                color: self.model.get('color')
             }));
             
             return self;
