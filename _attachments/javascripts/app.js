@@ -281,7 +281,7 @@
             
             var self = this;
             
-            document.body.appendChild(new DialogView({
+            document.body.appendChild(new DatabaserView({
                 databases: self.databases
             }).render().el);
             
@@ -479,80 +479,6 @@
             }));
             
             return self;
-        }
-        
-    });
-    
-    window.DatabaserView = Backbone.View.extend({
-        
-        className: 'Databaser',
-        
-        events: {
-            'submit .Databaser-form': 'submit',
-            'click .Databaser-cancel': 'cancel'
-        },
-        
-        initialize: function () {
-            
-            var self = this;
-            
-            self.template = _.template($('#' + self.className).html());
-            self.databases = self.options.databases;
-            
-            return;
-        },
-        
-        render: function () {
-            
-            var self = this;
-            
-            $(self.el).html(self.template({}));
-            
-            return self;
-        },
-        
-        submit: function (e) {
-            e.preventDefault();
-            
-            var self = this,
-                $form = self.$('form'),
-                name = $form.find('[name="name"]').val(),
-                slug = $form.find('[name="slug"]').val(),
-                obj = {
-                    type: 'database',
-                    name: name,
-                    slug: slug
-                };
-            
-            if (slug === undefined || name === undefined)
-            {
-                return;
-            }
-            
-            self.remove();
-            self.databases.add(obj);
-            
-            $.couch.db(slug).create({
-                success: function () {
-                    $.couch.db('tarmac').saveDoc(obj, {
-                        success: function () {
-                            $.couch.replicate('tarmac', slug, null, { doc_ids: ['_design/geo'] })
-                        }
-                    });
-                }
-            });
-            
-            return;
-        },
-        
-        cancel: function (e) {
-            e.preventDefault();
-            
-            var self = this;
-            
-            self.remove();
-            
-            return;
         }
         
     });
@@ -1058,21 +984,45 @@
         
     });
     
+    // Dialogs
+    
     window.DialogView = Backbone.View.extend({
         
-        className: 'Dialog',
+        prerender: function () {
+            
+            var self = this;
+            
+            _.bindAll(self, 'close');
+            
+            self.pretemplate = _.template($('#Dialog').html());
+            
+            $(self.el)
+                .html(self.pretemplate({}))
+                .addClass('Dialog')
+                ;
+            
+            self.$content = self.$('.Dialog-content');
+            
+            return self;
+        }
+        
+    });
+    
+    window.DatabaserView = DialogView.extend({
+        
+        className: 'Databaser',
         
         events: {
-            'click': 'close'
+            'submit .Databaser-form': 'submit',
+            'click .Databaser-cancel': 'cancel'
         },
         
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'close');
-            
             self.template = _.template($('#' + self.className).html());
+            self.databases = self.options.databases;
             
             return;
         },
@@ -1081,12 +1031,49 @@
             
             var self = this;
             
-            $(self.el).html(self.template({}));
+            self.prerender();
+            
+            self.$content.html(self.template({}));
             
             return self;
         },
         
-        close: function () {
+        submit: function (e) {
+            e.preventDefault();
+            
+            var self = this,
+                $form = self.$('form'),
+                name = $form.find('[name="name"]').val(),
+                slug = $form.find('[name="slug"]').val(),
+                obj = {
+                    type: 'database',
+                    name: name,
+                    slug: slug
+                };
+            
+            if (slug === undefined || name === undefined)
+            {
+                return;
+            }
+            
+            self.remove();
+            self.databases.add(obj);
+            
+            $.couch.db(slug).create({
+                success: function () {
+                    $.couch.db('tarmac').saveDoc(obj, {
+                        success: function () {
+                            $.couch.replicate('tarmac', slug, null, { doc_ids: ['_design/geo'] })
+                        }
+                    });
+                }
+            });
+            
+            return;
+        },
+        
+        cancel: function (e) {
+            e.preventDefault();
             
             var self = this;
             
@@ -1096,6 +1083,8 @@
         }
         
     });
+    
+    // Application
     
     window.Tarmac = Backbone.Router.extend({
          
@@ -1133,6 +1122,8 @@
         }
         
     });
+    
+    // Initialization
     
     window.databases = new Databases();
     
