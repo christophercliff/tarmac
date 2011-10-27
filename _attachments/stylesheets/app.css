@@ -133,6 +133,9 @@ body:after {
                     .Database-control:hover {
                         background-color: #ddd;
                     }
+                    .Database-control:active {
+                        background-color: #d5d5d5;
+                    }
         .Database canvas {
             position: absolute; right: 62px; top: 16px;
         }
@@ -150,6 +153,7 @@ body:after {
             font-size: 12px; line-height: 12px;
         }
         .Document-id:hover {
+            color: #333;
             cursor: pointer;
         }
 
