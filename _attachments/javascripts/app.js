@@ -1,5 +1,20 @@
 (function(window, undefined){
     
+    var colorArr = [
+        3,
+        6,
+        9,
+        12,
+        15,
+        18,
+        21,
+        24,
+        27,
+        30,
+        33,
+        36
+    ];
+    
     window.Server = Backbone.Model.extend({
         
     });
@@ -48,7 +63,7 @@
             var self = this,
                 canvas = document.createElement('canvas'),
                 ctx = canvas.getContext('2d'),
-                i = Math.floor(Math.random()*12)*20 + 2;
+                i = 360 - colorArr.pop()*10;
             
             self.set({
                 color: 'hsl(' + i + ', 84%, 70%)'
@@ -683,11 +698,11 @@
                 ;
             
             self.map = new google.maps.Map($map.get(0), {
-                zoom: 8,
-                center: new google.maps.LatLng(42.37, -71.03),
                 mapTypeId: google.maps.MapTypeId.TERRAIN
             });
+            self.geocoder = new google.maps.Geocoder();
             
+            self.fit();
             self.resize();
             
             return self;
@@ -731,8 +746,13 @@
             
             if (bounds.isEmpty())
             {
-                self.map.setCenter(new google.maps.LatLng(42.37, -71.03));
-                self.map.setZoom(8);
+                self.geocoder.geocode({ 'address': 'US' }, function(results, status){
+                    
+                    var ne = results[0].geometry.viewport.getNorthEast(),
+                        sw = results[0].geometry.viewport.getSouthWest();
+                    
+                    self.map.fitBounds(results[0].geometry.viewport);               
+                });
                 
                 return;
             }
