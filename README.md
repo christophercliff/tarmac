@@ -5,15 +5,3 @@ This is *pre-alpha* software.
 ##Demo
 
 Try the latest demo build [here](http://christophercliff.iriscouch.com/tarmac/_design/tarmac/index.html).
-
-##Installation
-
-TODO
-
-##Contributing
-
-TODO
-
-##License
-
-TODO
