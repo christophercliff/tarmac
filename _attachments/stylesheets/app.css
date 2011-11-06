@@ -42,11 +42,72 @@ body:after {
 
 .Databaser {
     padding: 20px 30px;
-    background-color: #666;
 }
+    .Databaser-name {
+        margin-bottom: 38px;
+        color: #fff;
+        font-size: 16px; line-height: 16px; font-weight: bold;
+        text-shadow: -1px -1px 1px #000;
+    }
     .Databaser-cancel {
         color: #fff;
     }
+    .Databaser-refresh {
+        position: absolute; right: 30px; top: 20px;
+        padding: 10px 14px;
+        color: #436437;
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#585f63), to(#383d40));
+        background-image: -webkit-linear-gradient(top, #585f63, #383d40);
+        background-image: -moz-linear-gradient(top, #659155, #578348);
+        border: solid 1px #25282a;
+        border-radius: 4px;
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.35), inset 1px 1px 1px rgba(255, 255, 255, 0.15);
+        font-size: 11px; line-height: 11px; font-weight: bold;
+        text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.35);
+        cursor: pointer;
+    }
+    .Databaser-reset {
+        float: left;
+        padding: 10px 14px;
+        color: #742b2c;
+        background-image: -webkit-gradient(linear, left top, left bottom, from(#585f63), to(#383d40));
+        background-image: -webkit-linear-gradient(top, #585f63, #383d40);
+        background-image: -moz-linear-gradient(top, #ba4e4f, #983738);
+        border: solid 1px #25282a;
+        border-radius: 4px;
+        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.35), inset 1px 1px 1px rgba(255, 255, 255, 0.15);
+        font-size: 11px; line-height: 11px; font-weight: bold;
+        text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+.Existing-collection {
+    
+}
+    .Existing {
+        margin-bottom: 7px;
+    }
+        .Existing label {
+            position: relative;
+            display: block;
+            padding: 13px 10px 13px 38px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .Existing-active label {
+            background-image: -webkit-gradient(linear, left top, left bottom, from(#585f63), to(#383d40));
+            background-image: -webkit-linear-gradient(top, #585f63, #383d40);
+            background-image: -moz-linear-gradient(top, #585f63, #383d40);
+        }
+            .Existing input {
+                position: absolute; left: 10px; top: 10px;
+            }
+            .Existing span {
+                display: block;
+                color: #fff;
+                font-family: Monaco;
+                font-size: 12px; line-height: 12px;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.50);
+            }
 
 .Database-collection {
     padding-bottom: 108px;
@@ -178,6 +239,8 @@ body:after {
         position: fixed; left: 50%; top: 50%;
         width: 600px; height: 400px;
         margin: -200px 0 0 -300px;
-        background-color: #000;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.50);
+        background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.75), rgba(0, 0, 0, 0.75));
+        border: solid 1px #000;
+        border-radius: 4px;
+        box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.70), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     }

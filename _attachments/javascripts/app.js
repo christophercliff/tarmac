@@ -15,25 +15,39 @@
         36
     ];
     
-    window.Server = Backbone.Model.extend({
+    window.Existing = Backbone.Model.extend({
+        
+        defaults: {
+            isActive: false
+        }
         
     });
     
-    window.Servers = Backbone.Collection.extend({
+    window.Existings = Backbone.Collection.extend({
         
-        model: Server,
+        model: Existing,
         
-        url: '/tarmac/_design/tarmac/_view/by_type?key="server"'
+        url: '/_all_dbs',
         
-    });
-    
-    window.Detectable = Backbone.Model.extend({
-        
-    });
-    
-    window.Detectables = Backbone.Collection.extend({
-        
-        model: Detectable,
+        parse: function (response) {
+            
+            var valids = [],
+                re = /^_/;
+            
+            _.each(response, function(db){
+                
+                if (db === 'tarmac' || re.test(db))
+                {
+                    return;
+                }
+                
+                valids.push({
+                    slug: db
+                });
+            });
+            
+            return valids;
+        }
         
     });
     
@@ -198,32 +212,39 @@
             context.lineCap = 'round';
             context.strokeStyle = opts.color;
             
-            var lowestOpacity = 0.18
-            var sectors = [];
-            var opacity = [];
-            for (var i = 0; i < opts.count; i++) {
-              var a = 2 * Math.PI / opts.count * i - Math.PI / 2;
-              var cos = Math.cos(a);
-              var sin = Math.sin(a);
+            var lowestOpacity = 0.18,
+                sectors = [],
+                opacity = [];
+            
+            for (var i = 0, l = opts.count; i < l; i++)
+            {
+                var a = 2 * Math.PI / opts.count * i - Math.PI / 2,
+                    cos = Math.cos(a),
+                    sin = Math.sin(a);
+              
               sectors[i] = [opts.inner * cos, opts.inner * sin, opts.outer * cos, opts.outer * sin];
               opacity[i] = Math.pow(i / (opts.count - 1), 1.8) * (1 - lowestOpacity) + lowestOpacity;
             }
             
-            var timer;
-            var counter = 0;
+            var timer,
+                counter = 0;
             
-            (function frame() {
-              context.clearRect(0, 0, canvas.width, canvas.height);
-              opacity.unshift(opacity.pop());
-              for (var i = 0; i < opts.count; i++) {
-                context.globalAlpha = opacity[i];
-                context.beginPath();
-                context.moveTo(center + sectors[i][0], center + sectors[i][1]);
-                context.lineTo(center + sectors[i][2], center + sectors[i][3]);
-                context.stroke();
-              }
-
-              timer = setTimeout(frame, delay);
+            (function frame(){
+                
+                context.clearRect(0, 0, canvas.width, canvas.height);
+                opacity.unshift(opacity.pop());
+                
+                for (var i = 0, l = opts.count; i < l; i++)
+                {
+                    context.globalAlpha = opacity[i];
+                    context.beginPath();
+                    context.moveTo(center + sectors[i][0], center + sectors[i][1]);
+                    context.lineTo(center + sectors[i][2], center + sectors[i][3]);
+                    context.stroke();
+                }
+                
+                timer = setTimeout(frame, delay);
+                
             })();
             
             return self;
@@ -967,7 +988,9 @@
             
             var self = this;
             
-            $(self.el).html(self.template(self.model.toJSON()));
+            $(self.el)
+                .html(self.template(self.model.toJSON()))
+                ;
             
             return self;
         },
@@ -984,26 +1007,45 @@
         
     });
     
-    // Dialogs
-    
     window.DialogView = Backbone.View.extend({
         
-        prerender: function () {
+        className: 'Dialog',
+        
+        events: {
+            
+        },
+        
+        initialize: function () {
             
             var self = this;
             
             _.bindAll(self, 'close');
             
-            self.pretemplate = _.template($('#Dialog').html());
+            self.template = _.template($('#' + self.className).html());
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this;
             
             $(self.el)
-                .html(self.pretemplate({}))
-                .addClass('Dialog')
+                .html(self.template({}))
                 ;
             
-            self.$content = self.$('.Dialog-content');
+            self.$content = self.$('.' + self.className + '-content');
             
             return self;
+        },
+        
+        close: function (e) {
+            
+            var self = this;
+            
+            self.remove();
+            
+            return;
         }
         
     });
@@ -1021,21 +1063,64 @@
             
             var self = this;
             
+            _.bindAll(self, 'render');
+            
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
+            self.existings = self.options.existings;
+            
+            self.databases
+                .bind('reset', self.render)
+                ;
+            
+            self.existings
+                .bind('reset', self.render)
+                ;
+            
+            self.dialogView = new DialogView().render();
+            
+            self.dialogView.$content
+                .append(self.el)
+                ;
             
             return;
         },
         
         render: function () {
             
-            var self = this;
+            var self = this,
+                $existings;
             
-            self.prerender();
+            $(self.el)
+                .html(self.template({}))
+                ;
             
-            self.$content.html(self.template({}));
+            $existings = self.$('.Existing-collection')
             
-            return self;
+            self.existings.each(function(existing){
+                
+                self.databases.each(function(database){
+                    
+                    if (database.get('slug') === existing.get('slug'))
+                    {
+                        existing.set({
+                            isActive: true
+                        })
+                        
+                        return false;
+                    }
+                    
+                });
+                
+                $existings
+                    .append(new ExistingView({
+                        model: existing
+                    }).render().el)
+                    ;
+            });
+            
+            // Inherit the dialog view (sort of...)
+            return self.dialogView;
         },
         
         submit: function (e) {
@@ -1077,58 +1162,78 @@
             
             var self = this;
             
-            self.remove();
+            self.dialogView.remove();
             
             return;
         }
         
     });
     
-    // Application
-    
-    window.Tarmac = Backbone.Router.extend({
-         
-        routes: {
-            '': 'default'
+    window.ExistingView = Backbone.View.extend({
+        
+        className: 'Existing',
+        
+        tagName: 'li',
+        
+        events: {
+            'change input': 'change'
         },
         
         initialize: function () {
             
             var self = this;
             
-            self.mapView = new MapView({
-                databases: window.databases
-            });
-            self.trayView = new TrayView({
-                databases: window.databases
-            });
-            
-            Backbone.history.start();
+            self.template = _.template($('#' + self.className).html());
             
             return;
         },
         
-        default: function () {
+        render: function () {
             
             var self = this;
             
+            $(self.el)
+                .html(self.template(self.model.toJSON()))
+                ;
             
-            document.body.appendChild(self.trayView.render().el);
-            document.body.appendChild(self.mapView.render().el);
+            if (self.model.get('isActive'))
+            {
+                $(self.el)
+                    .addClass(self.className + '-active')
+                    ;
+            }
+            else
+            {
+                $(self.el)
+                    .removeClass(self.className + '-active')
+                    ;
+            }
             
-            window.databases.fetch();
+            return self;
+        },
+        
+        change: function (e) {
+            
+            var self = this,
+                $input = $(e.target),
+                isChecked = $input.is(':checked');
+            
+                if (isChecked)
+                {
+                    $(self.el)
+                        .addClass(self.className + '-active')
+                        ;
+                }
+                else
+                {
+                    $(self.el)
+                        .removeClass(self.className + '-active')
+                        ;
+                }
             
             return;
         }
         
-    });
-    
-    // Initialization
-    
-    window.databases = new Databases();
-    
-    $(function(){
-        new Tarmac();
     });
     
 })(window);

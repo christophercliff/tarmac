@@ -22,7 +22,8 @@
                     'javascripts/lib/underscore.js',
                     'javascripts/lib/backbone.js',
                     'javascripts/lib/geojson.js',
-                    'javascripts/app.js'
+                    'javascripts/app.js',
+                    'javascripts/init.js'
                 ]
             });
             
@@ -44,10 +45,10 @@
         
         <script id="Tray" type="text/template">
             
-            <div class="Tray-name">Databases</div>
+            <div class="Tray-name">Layers</div>
             
             <div class="Tray-operation-collection">
-                <div class="Tray-operation add-database">Add</div>
+                <div class="Tray-operation add-database">Setup</div>
             </div>
             
             <ol class="Database-collection"></ol>
@@ -64,7 +65,7 @@
                         <div class="Database-control add-feature">Add Feature</div>
                         <div class="Database-control edit-database" onclick="alert('Not Implemented');">Edit</div>
                         <div class="Database-control delete-database">Delete</div>
-                        <div class="Database-control" onclick="alert('Not Implemented');">Export</div>
+                        <div class="Database-control" onclick="alert('Not Implemented');">JSON</div>
                     </div>
                     <ol class="Document-collection"></ol>
                 </div>
@@ -92,7 +93,9 @@
         
         <script id="Databaser" type="text/template">
             
-            <form class="Databaser-form" action="#">
+            <div class="Databaser-name">Setup</div>
+            
+            <form class="Databaser-form" action="#" style="display: none;">
                 
                 <input name="name" value="" autocomplete="off" placeholder="Name" />
                 <input name="slug" value="" autocomplete="off" placeholder="Slug" />
@@ -102,6 +105,25 @@
                 <a class="Databaser-cancel" href="#">Cancel</a>
                 
             </form>
+            
+            <form class="" action="#">
+                <ol class="Existing-collection"></ol>
+            </form>
+            
+            <ul class="">
+                <li class="">
+                    <div class="Databaser-refresh">Refresh</div>
+                </li>
+                <li class="">
+                    <div class="Databaser-reset">Reset</div>
+                </li>
+            </ul>
+            
+        </script>
+        
+        <script id="Existing" type="text/template">
+            
+            <label><input type="checkbox" value="<%= slug %>" name="name" /><span><%= slug %><span></label>
             
         </script>
         
