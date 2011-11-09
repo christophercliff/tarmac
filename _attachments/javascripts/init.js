@@ -17,7 +17,8 @@ window.Tarmac = Backbone.Router.extend({
             databases: window.databases
         });
         self.trayView = new TrayView({
-            databases: window.databases
+            databases: window.databases,
+            existings: window.existings
         });
         self.databaserView = new DatabaserView({
             databases: window.databases,

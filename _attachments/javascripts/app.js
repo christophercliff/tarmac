@@ -65,6 +65,7 @@
             features.url = '/' + self.get('slug') + '/_design/geo/_spatiallist/geojson/full?bbox=-180%2C-90%2C180%2C90';
             
             self.set({
+                id: self.get('slug'),
                 features: features,
                 image: self.image()
             });
@@ -268,9 +269,11 @@
             
             self.template = _.template($('#' + self.className).html());
             self.databases = self.options.databases;
+            self.existings = self.options.existings;
             
             self.databases
                 .bind('reset', self.render)
+                .bind('remove', self.render)
                 .bind('add', self.addDatabase)
                 ;
             
@@ -303,7 +306,8 @@
             var self = this;
             
             document.body.appendChild(new DatabaserView({
-                databases: self.databases
+                databases: self.databases,
+                existings: self.existings
             }).render().el);
             
             return;
@@ -1012,7 +1016,7 @@
         className: 'Dialog',
         
         events: {
-            
+            'click .Dialog-close': 'close'
         },
         
         initialize: function () {
@@ -1114,7 +1118,8 @@
                 
                 $existings
                     .append(new ExistingView({
-                        model: existing
+                        model: existing,
+                        databases: self.databases
                     }).render().el)
                     ;
             });
@@ -1184,6 +1189,7 @@
             var self = this;
             
             self.template = _.template($('#' + self.className).html());
+            self.databases = self.options.databases;
             
             return;
         },
@@ -1220,16 +1226,60 @@
             
                 if (isChecked)
                 {
+                    self.add($input.val());
+                    
                     $(self.el)
                         .addClass(self.className + '-active')
                         ;
                 }
                 else
                 {
+                    self.remove($input.val());
+                    
                     $(self.el)
                         .removeClass(self.className + '-active')
                         ;
                 }
+            
+            return;
+        },
+        
+        add: function (val) {
+            
+            var self = this,
+                obj = {
+                    type: 'database',
+                    name: val,
+                    slug: val
+                };
+            
+            self.databases.add(obj);
+            
+            $.couch.db('tarmac').saveDoc(obj, {
+                success: function () {
+                    
+                }
+            });
+            
+            return;
+        },
+        
+        remove: function (val) {
+            
+            var self = this,
+                db = self.databases.get(val),
+                obj ={
+                    _id: db.get('_id'),
+                    _rev: db.get('_rev')
+                };
+            
+            self.databases.remove(val);
+            
+            $.couch.db('tarmac').removeDoc(obj, {
+                success: function () {
+                    
+                }
+            });
             
             return;
         }

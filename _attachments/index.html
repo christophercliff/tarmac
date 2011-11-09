@@ -112,18 +112,18 @@
             
             <ul class="">
                 <li class="">
-                    <div class="Databaser-refresh">Refresh</div>
+                    <div class="Databaser-refresh Dialog-close">Close</div>
                 </li>
-                <li class="">
+                <!--<li class="">
                     <div class="Databaser-reset">Reset</div>
-                </li>
+                </li>-->
             </ul>
             
         </script>
         
         <script id="Existing" type="text/template">
             
-            <label><input type="checkbox" value="<%= slug %>" name="name" /><span><%= slug %><span></label>
+            <label><input type="checkbox" value="<%= slug %>" name="name" <%= (!isActive) ? '' : 'checked="checked"' %> /><span><%= slug %><span></label>
             
         </script>
         

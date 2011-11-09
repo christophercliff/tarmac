@@ -240,6 +240,7 @@ body:after {
         width: 600px; height: 400px;
         margin: -200px 0 0 -300px;
         background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.75), rgba(0, 0, 0, 0.75));
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.75)), to(rgba(0, 0, 0, 0.75)));
         border: solid 1px #000;
         border-radius: 4px;
         box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.70), inset 0 1px 0 rgba(255, 255, 255, 0.15);
