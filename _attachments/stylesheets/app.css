@@ -237,7 +237,7 @@ body:after {
 }
     .Dialog-content {
         position: fixed; left: 50%; top: 50%;
-        width: 600px; height: 400px;
+        width: 600px; height: 400px; overflow-y: scroll;
         margin: -200px 0 0 -300px;
         background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.75), rgba(0, 0, 0, 0.75));
         background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.75)), to(rgba(0, 0, 0, 0.75)));

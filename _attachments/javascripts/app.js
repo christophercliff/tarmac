@@ -19,6 +19,11 @@
         
         defaults: {
             isActive: false
+        },
+        
+        parse: function (response) {
+            
+            console.log(response);
         }
         
     });
@@ -1250,14 +1255,20 @@
                 obj = {
                     type: 'database',
                     name: val,
-                    slug: val
+                    slug: val,
+                    is: val
                 };
             
             self.databases.add(obj);
             
             $.couch.db('tarmac').saveDoc(obj, {
-                success: function () {
-                    
+                success: function (response) {
+                    self.databases.get(val)
+                        .set({
+                            _id: response.id,
+                            _rev: response.rev
+                        })
+                        ;
                 }
             });
             
