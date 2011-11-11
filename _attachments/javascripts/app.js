@@ -341,7 +341,8 @@
             'click .fetch-features': 'fetchFeatures',
             'click .clear-features': 'clearFeatures',
             'click .add-feature': 'addFeature',
-            'click .delete-database': 'deleteDatabase'
+            'click .delete-database': 'deleteDatabase',
+            'click .export-database': 'exportDatabase'
         },
         
         initialize: function () {
@@ -474,6 +475,18 @@
             self.remove();
             
             self.features.reset([]);
+            
+            return;
+        },
+        
+        exportDatabase: function (e) {
+            e.preventDefault();
+            
+            var self = this;
+            
+            document.body.appendChild(new ApiView({
+                model: self.model
+            }).render().el);
             
             return;
         }
@@ -1059,7 +1072,7 @@
         
     });
     
-    window.DatabaserView = DialogView.extend({
+    window.DatabaserView = Backbone.View.extend({
         
         className: 'Databaser',
         
@@ -1293,6 +1306,38 @@
             });
             
             return;
+        }
+        
+    });
+    
+    window.ApiView = Backbone.View.extend({
+        
+        className: 'Api',
+        
+        initialize: function () {
+            
+            var self = this;
+            
+            self.template = _.template($('#' + self.className).html());
+            
+            self.dialogView = new DialogView().render();
+            
+            self.dialogView.$content
+                .append(self.el)
+                ;
+            
+            return;
+        },
+        
+        render: function () {
+            
+            var self = this;
+            
+            $(self.el)
+                .html(self.template(self.model.toJSON()))
+                ;
+            
+            return self.dialogView;
         }
         
     });

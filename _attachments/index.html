@@ -65,7 +65,7 @@
                         <div class="Database-control add-feature">Add Feature</div>
                         <div class="Database-control edit-database" onclick="alert('Not Implemented');">Edit</div>
                         <div class="Database-control delete-database">Delete</div>
-                        <div class="Database-control" onclick="alert('Not Implemented');">JSON</div>
+                        <div class="Database-control export-database">JSON</div>
                     </div>
                     <ol class="Document-collection"></ol>
                 </div>
@@ -182,6 +182,12 @@
         <script id="Dialog" type="text/template">
             
             <div class="Dialog-content"></div>
+            
+        </script>
+        
+        <script id="Api" type="text/template">
+            
+            <div class="Api-url">GET: http://<%= window.location.host %>:5984/<%= slug %>/_design/geo/_spatiallist/geojson/full?bbox=-180%2C-90%2C180%2C90</div>
             
         </script>
         

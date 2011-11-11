@@ -41,29 +41,25 @@ body:after {
         }
 
 .Databaser {
-    padding: 20px 30px;
+    
 }
     .Databaser-name {
-        margin-bottom: 38px;
+        padding: 30px;
         color: #fff;
-        font-size: 16px; line-height: 16px; font-weight: bold;
-        text-shadow: -1px -1px 1px #000;
+        font-size: 14px; line-height: 14px;
     }
     .Databaser-cancel {
         color: #fff;
     }
     .Databaser-refresh {
-        position: absolute; right: 30px; top: 20px;
+        position: absolute; right: 10px; top: 10px;
         padding: 10px 14px;
-        color: #436437;
-        background-image: -webkit-gradient(linear, left top, left bottom, from(#585f63), to(#383d40));
-        background-image: -webkit-linear-gradient(top, #585f63, #383d40);
-        background-image: -moz-linear-gradient(top, #659155, #578348);
-        border: solid 1px #25282a;
-        border-radius: 4px;
-        box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.35), inset 1px 1px 1px rgba(255, 255, 255, 0.15);
-        font-size: 11px; line-height: 11px; font-weight: bold;
-        text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.35);
+        color: #666;
+        background-color: rgba(30, 30, 30, 0.99);
+        border-top: solid 1px rgba(255, 255, 255, 0.10);
+        border: solid 1px #333;
+        border-radius: 1px;
+        font-size: 10px; line-height: 10px;
         cursor: pointer;
     }
     .Databaser-reset {
@@ -84,29 +80,30 @@ body:after {
     
 }
     .Existing {
-        margin-bottom: 7px;
+        
     }
         .Existing label {
             position: relative;
             display: block;
-            padding: 13px 10px 13px 38px;
-            border-radius: 4px;
+            padding: 21px 30px;
+            color: #fff;
+            font-size: 14px; line-height: 14px; font-weight: bold;
             cursor: pointer;
         }
         .Existing-active label {
-            background-image: -webkit-gradient(linear, left top, left bottom, from(#585f63), to(#383d40));
+            padding: 20px 30px;
+            background-color: rgba(30, 30, 30, 0.99);
+            border-top: solid 1px rgba(255, 255, 255, 0.10);
+            border-bottom: solid 1px #000;
+            /*background-image: -webkit-gradient(linear, left top, left bottom, from(#585f63), to(#383d40));
             background-image: -webkit-linear-gradient(top, #585f63, #383d40);
-            background-image: -moz-linear-gradient(top, #585f63, #383d40);
+            background-image: -moz-linear-gradient(top, #585f63, #383d40);*/
         }
             .Existing input {
-                position: absolute; left: 10px; top: 10px;
+                position: absolute; right: 18px; top: 18px;
             }
             .Existing span {
                 display: block;
-                color: #fff;
-                font-family: Monaco;
-                font-size: 12px; line-height: 12px;
-                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.50);
             }
 
 .Database-collection {
@@ -226,6 +223,7 @@ body:after {
     .Map-map {
         
     }
+
 .Group-collection {
     position: absolute; right: 100%;
 }
@@ -239,9 +237,19 @@ body:after {
         position: fixed; left: 50%; top: 50%;
         width: 600px; height: 400px; overflow-y: scroll;
         margin: -200px 0 0 -300px;
-        background-image: -moz-linear-gradient(top, rgba(50, 50, 50, 0.75), rgba(0, 0, 0, 0.75));
+        background-image: -moz-linear-gradient(top, rgba(20, 20, 20, 0.75), rgba(0, 0, 0, 0.75));
         background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.75)), to(rgba(0, 0, 0, 0.75)));
-        border: solid 1px #000;
+        /*border: solid 1px #000;*/
         border-radius: 4px;
         box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.70), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+.Api {
+    
+}
+    .Api-url {
+        color: #999;
+        padding: 5px 30px;
+        font-family: Monaco;
+        font-size: 12px; line-height: 12px;
     }
