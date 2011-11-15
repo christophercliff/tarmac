@@ -75,6 +75,11 @@ body:after {
         font-size: 11px; line-height: 11px; font-weight: bold;
         text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.35);
     }
+    .Databaser-form {
+        padding: 10px 30px;
+        color: #fff;
+        font-size: 14px; line-height: 14px;
+    }
 
 .Existing-collection {
     
@@ -197,6 +202,10 @@ body:after {
         .Database canvas {
             position: absolute; right: 62px; top: 16px;
         }
+        .Database-empty {
+            padding: 16px 30px;
+            color: #ccc;
+        }
 
 .Document-collection {
     padding: 16px 0;
@@ -234,9 +243,9 @@ body:after {
     background-color: rgba(0, 0, 0, 0.75);
 }
     .Dialog-content {
-        position: fixed; left: 50%; top: 50%;
-        width: 600px; height: 400px; overflow-y: scroll;
-        margin: -200px 0 0 -300px;
+        position: fixed; left: 50%; top: 100px;
+        width: 600px; max-height: 400px; overflow-y: scroll;
+        margin-left: -300px;
         background-image: -moz-linear-gradient(top, rgba(20, 20, 20, 0.75), rgba(0, 0, 0, 0.75));
         background-image: -webkit-gradient(linear, left top, left bottom, from(rgba(50, 50, 50, 0.75)), to(rgba(0, 0, 0, 0.75)));
         /*border: solid 1px #000;*/
@@ -245,11 +254,25 @@ body:after {
     }
 
 .Api {
-    
+    padding: 30px 0;
+    font-size: 14px; line-height: 18px;
 }
+    .Api-description {
+        padding: 0 30px; margin-bottom: 18px;
+        color: #fff;
+    }
+        .Api-description code {
+            font-family: Monaco;
+        }
+        .Api-description a {
+            color: #fff;
+            text-decoration: underline;
+        }
     .Api-url {
+        display: block;
+        padding: 18px 30px;
         color: #999;
-        padding: 5px 30px;
+        background-color: #000;
+        border-top: solid 1px rgba(255, 255, 255, 0.15);
         font-family: Monaco;
-        font-size: 12px; line-height: 12px;
     }

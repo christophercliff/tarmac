@@ -63,9 +63,9 @@
                 <div class="Database-hider">
                     <div class="Database-control-collection">
                         <div class="Database-control add-feature">Add Feature</div>
-                        <div class="Database-control edit-database" onclick="alert('Not Implemented');">Edit</div>
+                        <!--<div class="Database-control edit-database" onclick="alert('Not Implemented');">Edit</div>-->
                         <div class="Database-control delete-database">Delete</div>
-                        <div class="Database-control export-database">JSON</div>
+                        <div class="Database-control export-database">API</div>
                     </div>
                     <ol class="Document-collection"></ol>
                 </div>
@@ -95,14 +95,14 @@
             
             <div class="Databaser-name">Setup</div>
             
-            <form class="Databaser-form" action="#" style="display: none;">
+            <form class="Databaser-form" action="#">
                 
                 <input name="name" value="" autocomplete="off" placeholder="Name" />
                 <input name="slug" value="" autocomplete="off" placeholder="Slug" />
                 <input type="hidden" value="database" />
                 <input type="submit" value="Create Database" />
                 
-                <a class="Databaser-cancel" href="#">Cancel</a>
+                <!--<a class="Databaser-cancel" href="#">Cancel</a>-->
                 
             </form>
             
@@ -112,7 +112,7 @@
             
             <ul class="">
                 <li class="">
-                    <div class="Databaser-refresh Dialog-close">Close</div>
+                    <div class="Databaser-refresh Databaser-cancel">Close</div>
                 </li>
                 <!--<li class="">
                     <div class="Databaser-reset">Reset</div>
@@ -187,7 +187,9 @@
         
         <script id="Api" type="text/template">
             
-            <div class="Api-url">GET: http://<%= window.location.host %>/<%= slug %>/_design/geo/_spatiallist/geojson/full?bbox=-180%2C-90%2C180%2C90</div>
+            <div class="Api-description"><code>GET</code> <a href="http://geojson.org/" target="_blank">GeoJSON</a> features in a <a href="http://www.opensearch.org/Specifications/OpenSearch/Extensions/Geo/1.0/Draft_1#The_.22box.22_parameter" target="_blank">bounding box</a>:</div>
+            
+            <pre class="Api-url">http://<%= window.location.host %>/<%= slug %>/_design/geo/_spatiallist/geojson/full?bbox=-180,-90,180,90</pre>
             
         </script>
         

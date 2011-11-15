@@ -1034,14 +1034,14 @@
         className: 'Dialog',
         
         events: {
-            'click .Dialog-close': 'close'
+            'click': 'close'
         },
         
         initialize: function () {
             
             var self = this;
             
-            _.bindAll(self, 'close');
+            _.bindAll(self, 'close', 'layout');
             
             self.template = _.template($('#' + self.className).html());
             
@@ -1064,6 +1064,11 @@
         close: function (e) {
             
             var self = this;
+            
+            if (e.target !== self.el)
+            {
+                return;
+            }
             
             self.remove();
             
@@ -1142,7 +1147,6 @@
                     ;
             });
             
-            // Inherit the dialog view (sort of...)
             return self.dialogView;
         },
         
@@ -1164,8 +1168,14 @@
                 return;
             }
             
-            self.remove();
-            self.databases.add(obj);
+            self.existings
+                .add(obj)
+                ;
+            
+            self.databases
+                .add(obj)
+                .trigger('reset')
+                ;
             
             $.couch.db(slug).create({
                 success: function () {
